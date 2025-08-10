@@ -8,7 +8,7 @@
       <SelectionState runConfigName="JokesDatabaseTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="deleteJokesAndReadInList()">
+      <SelectionState runConfigName="markASSeenUpdatesJoke()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

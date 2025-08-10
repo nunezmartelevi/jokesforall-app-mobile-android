@@ -5,16 +5,18 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.levi.jokesforall.data.model.JokeEntity
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface JokeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertJokes(jokes: List<JokeEntity>)
+    suspend fun insertJokes(jokes: List<JokeEntity>): List<Long>
 
     @Query("DELETE FROM jokes")
     suspend fun deleteAll()
 
-    @Query("SELECT * FROM jokes")
-    fun loadAllJokes(): Flow<List<JokeEntity>>
+    @Query("SELECT * FROM jokes WHERE seen = false")
+    fun loadAllUnseenJokes(): List<JokeEntity>
+
+    @Query("UPDATE jokes SET seen = true WHERE id = :id")
+    fun markAsSeen(id: Int)
 }
