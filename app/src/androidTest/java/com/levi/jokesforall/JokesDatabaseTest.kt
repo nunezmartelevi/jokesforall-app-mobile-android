@@ -6,11 +6,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.levi.jokesforall.data.database.JokeDao
 import com.levi.jokesforall.data.database.JokesDatabase
-import com.levi.jokesforall.data.model.JokeEntity
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,8 +37,8 @@ class JokesDatabaseTest {
     @Throws(Exception::class)
     fun writeJokesAndLoadList() = runTest {
         jokeDao.insertJokes(jokesEntitiesTestData)
-        val jokes = jokeDao.loadAllJokes().first()
-        assert(jokes.isNotEmpty())
+        val jokes = jokeDao.loadAllUnseenJokes()
+        assert(jokes.isNotEmpty() && jokes.all { !it.seen })
     }
 
     @Test
@@ -49,8 +46,18 @@ class JokesDatabaseTest {
     fun deleteAllJokesReturnsEmptyList() = runTest {
         jokeDao.insertJokes(jokesEntitiesTestData)
         jokeDao.deleteAll()
-        val jokes = jokeDao.loadAllJokes().first()
+        val jokes = jokeDao.loadAllUnseenJokes()
         assert(jokes.isEmpty())
     }
 
+    @Test
+    @Throws(Exception::class)
+    fun markASSeenUpdatesJoke() = runTest {
+        jokeDao.insertJokes(jokesEntitiesTestData)
+        jokeDao.markAsSeen(135)
+        val unseenJokes = jokeDao.loadAllUnseenJokes()
+        val updatedJoke = jokesEntitiesTestData.firstOrNull { it.id == 135 }
+        assert(!unseenJokes.contains(updatedJoke))
+        assert(unseenJokes.size == 1)
+    }
 }

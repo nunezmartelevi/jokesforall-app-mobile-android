@@ -40,6 +40,7 @@ fun List<JokeDto>.asDatabaseModel(): List<JokeEntity> =
             setup = jokeDto.setup,
             delivery = jokeDto.delivery,
             safe = jokeDto.safe,
-            lang = jokeDto.lang
+            lang = jokeDto.lang,
+            seen = false
         )
     }

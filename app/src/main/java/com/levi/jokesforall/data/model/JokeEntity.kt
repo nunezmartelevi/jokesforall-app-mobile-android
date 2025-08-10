@@ -13,7 +13,8 @@ data class JokeEntity(
     val setup: String,
     val delivery: String?,
     val safe: Boolean,
-    val lang: String
+    val lang: String,
+    val seen: Boolean
 )
 
 fun List<JokeEntity>.asDomainModel(): List<Joke> =

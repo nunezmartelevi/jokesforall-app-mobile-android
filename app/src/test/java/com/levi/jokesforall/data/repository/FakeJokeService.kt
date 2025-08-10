@@ -5,9 +5,9 @@ import com.levi.jokesforall.data.remote.JokesService
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
 
-class FakeJokeService(private val shouldReturnError: Boolean = false) : JokesService {
+class FakeJokeService(private val isSuccessful: Boolean = true) : JokesService {
     override suspend fun getJokes(): Response<JokesResponse> {
-        return if (!shouldReturnError) {
+        return if (isSuccessful) {
             Response<JokesResponse>.success(
                 JokesResponse(
                     error = false,
@@ -16,7 +16,10 @@ class FakeJokeService(private val shouldReturnError: Boolean = false) : JokesSer
                 )
             )
         } else {
-            Response<JokesResponse>.error(500, byteArrayOf().toResponseBody(null))
+            Response<JokesResponse>.error(
+                500,
+                byteArrayOf().toResponseBody(null)
+            )
         }
     }
 }
