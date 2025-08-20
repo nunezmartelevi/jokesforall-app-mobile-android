@@ -2,6 +2,7 @@ package com.levi.jokesforall.data.repository
 
 import com.levi.jokesforall.data.model.JokesResponse
 import com.levi.jokesforall.data.remote.JokesService
+import com.levi.jokesforall.remoteJokes
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
 
@@ -11,8 +12,8 @@ class FakeJokeService(private val isSuccessful: Boolean = true) : JokesService {
             Response<JokesResponse>.success(
                 JokesResponse(
                     error = false,
-                    amount = jokesTestData.size,
-                    jokes = jokesTestData
+                    amount = remoteJokes.size,
+                    jokes = remoteJokes
                 )
             )
         } else {

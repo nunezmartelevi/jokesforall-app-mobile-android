@@ -14,9 +14,9 @@ interface JokeDao {
     @Query("DELETE FROM jokes")
     suspend fun deleteAll()
 
-    @Query("SELECT * FROM jokes WHERE seen = false")
+    @Query("SELECT * FROM jokes WHERE seen = 0")
     fun loadAllUnseenJokes(): List<JokeEntity>
 
-    @Query("UPDATE jokes SET seen = true WHERE id = :id")
+    @Query("UPDATE jokes SET seen = 1 WHERE id = :id")
     fun markAsSeen(id: Int)
 }

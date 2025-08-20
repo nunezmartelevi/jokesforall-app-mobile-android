@@ -20,5 +20,4 @@ object DispatchersModule {
     @Provides
     @Dispatcher(JokesDispatchers.Default)
     fun providesDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
-
 }
