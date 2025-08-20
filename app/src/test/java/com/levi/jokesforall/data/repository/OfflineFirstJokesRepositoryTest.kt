@@ -1,11 +1,10 @@
 package com.levi.jokesforall.data.repository
 
 import com.levi.jokesforall.data.database.JokeDao
-import com.levi.jokesforall.data.model.asDatabaseModel
 import com.levi.jokesforall.data.remote.JokesService
 import com.levi.jokesforall.data.remote.Result
 import com.levi.jokesforall.domain.repository.JokesRepository
-import kotlinx.coroutines.flow.first
+import com.levi.jokesforall.remoteJokes
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -48,7 +47,7 @@ class OfflineFirstJokesRepositoryTest {
 
     @Test
     fun `markJokeAsSeen updates the joke in the database`() = runTest {
-        val jokeToMark = jokesTestData.first()
+        val jokeToMark = remoteJokes.first()
         repository = OfflineFirstJokesRepository(
             service,
             dao,

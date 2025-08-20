@@ -63,6 +63,9 @@ android {
         compose = true
         buildConfig = true
     }
+    kotlinOptions {
+        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+    }
 }
 
 dependencies {
@@ -75,6 +78,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.constraintlayout)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     testImplementation(libs.junit)
     testImplementation(libs.kotlin.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
@@ -91,4 +96,5 @@ dependencies {
     implementation(libs.room.ktx)
     implementation(libs.dagger.hilt.android)
     ksp(libs.dagger.hilt.android.compiler)
+    testImplementation(kotlin("test"))
 }
