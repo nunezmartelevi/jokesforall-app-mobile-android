@@ -21,21 +21,24 @@ val Typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 32.sp,
         lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+        letterSpacing = 0.5.sp,
+        color = GreenTerminal
     ),
     bodyMedium = TextStyle(
         fontFamily = adobeDia,
         fontWeight = FontWeight.Normal,
         fontSize = 24.sp,
         lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+        letterSpacing = 0.5.sp,
+        color = GreenTerminal
     ),
     bodySmall = TextStyle(
         fontFamily = adobeDia,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+        letterSpacing = 0.5.sp,
+        color = GreenTerminal
     )
     /* Other default text styles to override
     titleLarge = TextStyle(

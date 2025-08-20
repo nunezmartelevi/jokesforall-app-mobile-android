@@ -12,22 +12,22 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
+    primary = GreenTerminal,
+    secondary = GreenTerminal,
+    tertiary = GreenTerminal,
     surface = DarkGrey,
     onPrimary = White,
     onSurface = White
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
+    primary = GreenTerminal,
+    secondary = GreenTerminal,
+    tertiary = GreenTerminal,
     background = Wood,
     surface = DarkGrey,
-    onPrimary = White,
-    onSurface = White
+    onPrimary = GreenTerminal,
+    onSurface = GreenTerminal
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
