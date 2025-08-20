@@ -63,8 +63,7 @@ fun TextFrame(
                 bottom.linkTo(parent.bottom, margin = 20.dp)
             }
         ) {
-            val textStyle = TextStyle()
-            footerContent(textStyle)
+            footerContent(MaterialTheme.typography.bodyMedium)
         }
     }
 }
@@ -78,12 +77,12 @@ private fun Header(
     Row(modifier = modifier.fillMaxWidth()) {
         Text(
             text = batteryLabel,
-            color = MaterialTheme.colorScheme.onPrimary
+            style = MaterialTheme.typography.bodySmall
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = soundLabel,
-            color = MaterialTheme.colorScheme.onPrimary
+            style = MaterialTheme.typography.bodySmall
         )
     }
 }
@@ -97,7 +96,7 @@ private fun MainContent(
         modifier = modifier.fillMaxWidth(),
         text = text,
         textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onPrimary
+        style = MaterialTheme.typography.bodyLarge
     )
 }
 
@@ -127,7 +126,7 @@ private fun TextFramePreview() {
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(R.string.continue_next_joke),
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    style = it
                 )
             }
         )
