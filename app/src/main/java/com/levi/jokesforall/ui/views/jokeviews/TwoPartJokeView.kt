@@ -1,11 +1,18 @@
 package com.levi.jokesforall.ui.views.jokeviews
 
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -13,15 +20,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.levi.jokesforall.R
 import com.levi.jokesforall.domain.model.Joke
+import com.levi.jokesforall.ui.theme.GreenTerminal
+import com.levi.jokesforall.ui.theme.JokesForAllTheme
 import com.levi.jokesforall.ui.views.JokesPreviewParameterProvider
 import com.levi.jokesforall.ui.views.frames.ConsoleFrame
 import com.levi.jokesforall.ui.views.frames.TextFrame
 import com.levi.jokesforall.util.calculateTextFramePadding
+import java.text.BreakIterator
 
 @Composable
 fun BoxWithConstraintsScope.TwoPartJokeView(
     modifier: Modifier = Modifier,
-    batteryLevel: Int,
     isSoundOn: Boolean,
     joke: Joke,
     canShowDelivery: Boolean,
@@ -32,6 +41,13 @@ fun BoxWithConstraintsScope.TwoPartJokeView(
     onToggleSound: () -> Unit
 ) {
     val mainContentText = if (canShowDelivery) joke.delivery ?: "" else joke.setup
+    val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
+    val animatedColor by infiniteTransition.animateColor(
+        initialValue = GreenTerminal.copy(alpha = 0.5f),
+        targetValue = GreenTerminal.copy(alpha = 1f),
+        animationSpec = infiniteRepeatable(tween(500), RepeatMode.Reverse),
+        label = "color"
+    )
 
     ConsoleFrame(
         modifier = modifier,
@@ -45,7 +61,6 @@ fun BoxWithConstraintsScope.TwoPartJokeView(
     TextFrame(
         modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
         maxHeight = maxHeight,
-        batteryLevel = batteryLevel,
         isSoundOn = isSoundOn,
         mainContentText = mainContentText
     ) { textStyle ->
@@ -78,7 +93,7 @@ fun BoxWithConstraintsScope.TwoPartJokeView(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(R.string.reveal_joke),
                     textAlign = TextAlign.Center,
-                    style = textStyle
+                    style = textStyle.copy(color = animatedColor)
                 )
             }
         }
@@ -90,17 +105,18 @@ fun BoxWithConstraintsScope.TwoPartJokeView(
 fun TwoPartJokeViewPreview(
     @PreviewParameter(JokesPreviewParameterProvider::class) jokes: List<Joke>
 ) {
-    BoxWithConstraints {
-        TwoPartJokeView(
-            batteryLevel = 61,
-            isSoundOn = true,
-            joke = jokes[0],
-            canShowDelivery = true,
-            canGoBack = true,
-            onNextJoke = {},
-            onPreviousJoke = {},
-            onShowDelivery = {},
-            onToggleSound = {}
-        )
+    JokesForAllTheme {
+        BoxWithConstraints {
+            TwoPartJokeView(
+                isSoundOn = true,
+                joke = jokes[0],
+                canShowDelivery = true,
+                canGoBack = true,
+                onNextJoke = {},
+                onPreviousJoke = {},
+                onShowDelivery = {},
+                onToggleSound = {}
+            )
+        }
     }
 }

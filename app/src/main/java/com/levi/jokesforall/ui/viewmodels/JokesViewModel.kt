@@ -21,8 +21,6 @@ class JokesViewModel @Inject constructor(private val repository: JokesRepository
 
     private var currentJokeIndex = -1
     private val jokes = mutableListOf<Joke>()
-
-    val batteryLevel = maxOf(Math.random() * 100, 50.0).toInt()
     val isSoundOn = true
 
     init {

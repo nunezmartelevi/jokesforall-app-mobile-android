@@ -18,21 +18,18 @@ import com.levi.jokesforall.ui.views.jokeviews.TwoPartJokeView
 @Composable
 fun JokesScreen(viewModel: JokesViewModel = viewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val batteryLevel = viewModel.batteryLevel
     val isSoundOn = viewModel.isSoundOn
 
     BoxWithConstraints {
         when (val state = uiState) {
             is Loading -> {
                 LoadingView(
-                    batteryLevel = batteryLevel,
                     isSoundOn = isSoundOn
                 )
             }
 
             is Error -> {
                 ErrorView(
-                    batteryLevel = batteryLevel,
                     isSoundOn = isSoundOn,
                     onRetry = viewModel::nextJoke
                 )
@@ -40,7 +37,6 @@ fun JokesScreen(viewModel: JokesViewModel = viewModel()) {
 
             is SinglePartJoke -> {
                 SinglePartJokeView(
-                    batteryLevel = batteryLevel,
                     isSoundOn = isSoundOn,
                     joke = state.joke,
                     canGoBack = state.canGoBack,
@@ -52,7 +48,6 @@ fun JokesScreen(viewModel: JokesViewModel = viewModel()) {
 
             is TwoPartJoke -> {
                 TwoPartJokeView(
-                    batteryLevel = viewModel.batteryLevel,
                     isSoundOn = viewModel.isSoundOn,
                     joke = state.joke,
                     canShowDelivery = state.canShowDelivery,

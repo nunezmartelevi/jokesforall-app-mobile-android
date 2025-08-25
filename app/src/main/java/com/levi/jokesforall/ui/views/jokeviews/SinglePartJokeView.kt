@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.levi.jokesforall.R
 import com.levi.jokesforall.domain.model.Joke
+import com.levi.jokesforall.ui.theme.JokesForAllTheme
 import com.levi.jokesforall.ui.views.JokesPreviewParameterProvider
 import com.levi.jokesforall.ui.views.frames.ConsoleFrame
 import com.levi.jokesforall.ui.views.frames.TextFrame
@@ -23,7 +24,6 @@ import com.levi.jokesforall.util.calculateTextFramePadding
 @Composable
 fun BoxWithConstraintsScope.SinglePartJokeView(
     modifier: Modifier = Modifier,
-    batteryLevel: Int,
     isSoundOn: Boolean,
     joke: Joke,
     canGoBack: Boolean,
@@ -43,7 +43,6 @@ fun BoxWithConstraintsScope.SinglePartJokeView(
     TextFrame(
         modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
         maxHeight = maxHeight,
-        batteryLevel = batteryLevel,
         isSoundOn = isSoundOn,
         mainContentText = joke.setup
     ) { textStyle ->
@@ -75,16 +74,17 @@ fun BoxWithConstraintsScope.SinglePartJokeView(
 fun SinglePartJokeViewPreview(
     @PreviewParameter(JokesPreviewParameterProvider::class) jokes: List<Joke>
 ) {
-    BoxWithConstraints {
-        SinglePartJokeView(
-            batteryLevel = 61,
-            isSoundOn = true,
-            joke = jokes[0],
-            canGoBack = true,
-            onNextJoke = {},
-            onPreviousJoke = {},
-            onToggleSound = {}
-        )
+    JokesForAllTheme {
+        BoxWithConstraints {
+            SinglePartJokeView(
+                isSoundOn = true,
+                joke = jokes[0],
+                canGoBack = true,
+                onNextJoke = {},
+                onPreviousJoke = {},
+                onToggleSound = {}
+            )
+        }
     }
 }
 
@@ -93,15 +93,16 @@ fun SinglePartJokeViewPreview(
 fun SinglePartJokeViewPreview2(
     @PreviewParameter(JokesPreviewParameterProvider::class) jokes: List<Joke>
 ) {
-    BoxWithConstraints {
-        SinglePartJokeView(
-            batteryLevel = 61,
-            isSoundOn = true,
-            joke = jokes[0],
-            canGoBack = true,
-            onNextJoke = {},
-            onPreviousJoke = {},
-            onToggleSound = {}
-        )
+    JokesForAllTheme {
+        BoxWithConstraints {
+            SinglePartJokeView(
+                isSoundOn = true,
+                joke = jokes[0],
+                canGoBack = true,
+                onNextJoke = {},
+                onPreviousJoke = {},
+                onToggleSound = {}
+            )
+        }
     }
 }

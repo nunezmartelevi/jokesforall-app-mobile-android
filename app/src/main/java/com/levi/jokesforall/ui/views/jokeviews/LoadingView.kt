@@ -8,6 +8,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices.PIXEL_4
 import androidx.compose.ui.tooling.preview.Preview
 import com.levi.jokesforall.R
+import com.levi.jokesforall.ui.theme.JokesForAllTheme
 import com.levi.jokesforall.ui.views.frames.ConsoleFrame
 import com.levi.jokesforall.ui.views.frames.TextFrame
 import com.levi.jokesforall.util.calculateTextFramePadding
@@ -15,7 +16,6 @@ import com.levi.jokesforall.util.calculateTextFramePadding
 @Composable
 fun BoxWithConstraintsScope.LoadingView(
     modifier: Modifier = Modifier,
-    batteryLevel: Int,
     isSoundOn: Boolean
 ) {
     ConsoleFrame(
@@ -26,7 +26,6 @@ fun BoxWithConstraintsScope.LoadingView(
     TextFrame(
         modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
         maxHeight = maxHeight,
-        batteryLevel = batteryLevel,
         isSoundOn = isSoundOn,
         mainContentText = stringResource(R.string.loading)
     )
@@ -35,10 +34,11 @@ fun BoxWithConstraintsScope.LoadingView(
 @Preview(device = PIXEL_4)
 @Composable
 fun LoadingViewPreview() {
-    BoxWithConstraints {
-        LoadingView(
-            batteryLevel = 61,
-            isSoundOn = true
-        )
+    JokesForAllTheme {
+        BoxWithConstraints {
+            LoadingView(
+                isSoundOn = true
+            )
+        }
     }
 }
