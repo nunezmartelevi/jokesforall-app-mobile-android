@@ -1,13 +1,10 @@
 <resources>
     <string name="app_name">JokesForAll</string>
-    <string name="sound_on">Sound: on</string>
-    <string name="sound_off">Sound: off</string>
-    <string name="battery_level">Battery: %1$d%%</string>
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading…</string>
     <string name="error">An error occurred</string>
-    <string name="retry">Press A to retry</string>
-    <string name="continue_next_joke">Press A to see next joke</string>
-    <string name="reveal_joke">Press A to hear the joke</string>
-    <string name="next_joke">Next joke: A</string>
-    <string name="previous_joke">Previous joke: B</string>>
+    <string name="retry">PRESS A TO RETRY</string>
+    <string name="continue_next_joke">PRESS A TO CONTINUE</string>
+    <string name="reveal_joke">PRESS A TO HEAR THE JOKE</string>
+    <string name="next_joke">NEXT: A</string>
+    <string name="previous_joke">BACK: B</string>>
 </resources>

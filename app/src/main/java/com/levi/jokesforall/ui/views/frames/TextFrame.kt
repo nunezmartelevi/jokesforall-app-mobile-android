@@ -1,16 +1,30 @@
 package com.levi.jokesforall.ui.views.frames
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -23,24 +37,42 @@ import com.levi.jokesforall.R
 import com.levi.jokesforall.ui.theme.DarkGrey
 import com.levi.jokesforall.ui.theme.JokesForAllTheme
 import com.levi.jokesforall.util.PIXEL_4_VIEW_PORT
+import kotlinx.coroutines.delay
+import java.text.BreakIterator
+import java.text.StringCharacterIterator
 
 @Composable
 fun TextFrame(
     modifier: Modifier = Modifier,
     maxHeight: Dp,
-    batteryLevel: Int,
     isSoundOn: Boolean,
     mainContentText: String,
     footerContent: @Composable (RowScope.(TextStyle) -> Unit) = {}
 ) {
-    val frameHeight = (maxHeight.value * 0.57).dp
-    val soundLabel = if (isSoundOn) R.string.sound_on else R.string.sound_off
-    val batteryLabel = R.string.battery_level
+    val calculatedFrameHeight = (maxHeight.value * 0.57).dp
+    val text = mainContentText
+    val breakIterator = remember(text) { BreakIterator.getCharacterInstance() }
+    val typingDelayInMs = 50L
+    var substringText by remember { mutableStateOf("") }
+    var shouldDisplayFooterText by remember { mutableStateOf(false) }
+
+    LaunchedEffect(text) {
+        shouldDisplayFooterText = false
+        breakIterator.text = StringCharacterIterator(text)
+        var nextIndex = breakIterator.next()
+        while (nextIndex != BreakIterator.DONE) {
+            substringText = text.subSequence(0, nextIndex).toString()
+            nextIndex = breakIterator.next()
+            delay(typingDelayInMs)
+        }
+        delay(100)
+        shouldDisplayFooterText = true
+    }
 
     ConstraintLayout(
         modifier = modifier
             .background(DarkGrey)
-            .height(frameHeight)
+            .height(calculatedFrameHeight)
             .padding(10.dp)
     ) {
         val (header, mainText, footer) = createRefs()
@@ -48,22 +80,24 @@ fun TextFrame(
             modifier = Modifier.constrainAs(header) {
                 top.linkTo(parent.top)
             },
-            soundLabel = stringResource(soundLabel),
-            batteryLabel = stringResource(batteryLabel, batteryLevel)
+            isSoundOn = isSoundOn
         )
         MainContent(
             modifier = Modifier.constrainAs(mainText) {
                 top.linkTo(header.bottom)
                 bottom.linkTo(footer.top)
             },
-            text = mainContentText
+            text = substringText
         )
         Footer(
-            modifier = Modifier.constrainAs(footer) {
-                bottom.linkTo(parent.bottom, margin = 20.dp)
-            }
+            modifier = Modifier
+                .constrainAs(footer) {
+                    bottom.linkTo(parent.bottom)
+                },
+            isVisible = shouldDisplayFooterText
         ) {
-            footerContent(MaterialTheme.typography.bodyMedium)
+            val textStyle = MaterialTheme.typography.bodyMedium
+            footerContent(textStyle)
         }
     }
 }
@@ -71,19 +105,20 @@ fun TextFrame(
 @Composable
 private fun Header(
     modifier: Modifier = Modifier,
-    soundLabel: String,
-    batteryLabel: String
+    isSoundOn: Boolean
 ) {
-    Row(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = batteryLabel,
-            style = MaterialTheme.typography.bodySmall
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        val soundIcon = if (isSoundOn) R.drawable.ic_sound_on else R.drawable.ic_sound_off
+        Image(
+            painter = painterResource(soundIcon),
+            modifier = Modifier.size(20.dp),
+            contentDescription = null
         )
         Spacer(modifier = Modifier.weight(1f))
-        Text(
-            text = soundLabel,
-            style = MaterialTheme.typography.bodySmall
-        )
+        Image(painter = painterResource(R.drawable.ic_battery_full), null)
     }
 }
 
@@ -103,12 +138,22 @@ private fun MainContent(
 @Composable
 private fun Footer(
     modifier: Modifier = Modifier,
+    isVisible: Boolean,
     content: @Composable (RowScope.() -> Unit)
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        content()
+    Box(modifier = modifier.height(30.dp)) {
+        AnimatedVisibility(
+            visible = isVisible,
+            enter = fadeIn(animationSpec = tween(500)),
+            exit = ExitTransition.None
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                content()
+            }
+        }
     }
 }
 
@@ -118,8 +163,7 @@ private fun TextFramePreview() {
     JokesForAllTheme {
         TextFrame(
             maxHeight = PIXEL_4_VIEW_PORT.second,
-            batteryLevel = 80,
-            isSoundOn = true,
+            isSoundOn = false,
             mainContentText = "This is a joke",
             footerContent = {
                 Text(
