@@ -1,6 +1,5 @@
 package com.levi.jokesforall.ui.views.jokeviews
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,32 +11,34 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.levi.jokesforall.R
 import com.levi.jokesforall.ui.theme.JokesForAllTheme
-import com.levi.jokesforall.ui.views.frames.ConsoleFrame
-import com.levi.jokesforall.ui.views.frames.TextFrame
+import com.levi.jokesforall.ui.views.frames.WoodFrame
+import com.levi.jokesforall.ui.views.frames.DisplayFrame
 import com.levi.jokesforall.util.calculateTextFramePadding
 
 @Composable
 fun BoxWithConstraintsScope.ErrorView(
     modifier: Modifier = Modifier,
     isSoundOn: Boolean,
+    onToggleSound: (Boolean) -> Unit,
     onRetry: () -> Unit
 ) {
-    ConsoleFrame(
+    WoodFrame(
         modifier = modifier,
         maxWidth = maxWidth,
         maxHeight = maxHeight,
-        onAButtonPress = onRetry
+        onAButtonPress = onRetry,
+        onSoundButtonPress = { onToggleSound(isSoundOn) }
     )
 
-    TextFrame(
+    DisplayFrame(
         modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
         maxHeight = maxHeight,
         isSoundOn = isSoundOn,
-        mainContentText = stringResource(R.string.error),
+        mainText = stringResource(R.string.error_message),
     ) { textStyle ->
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = stringResource(R.string.retry),
+            text = stringResource(R.string.action_retry),
             textAlign = TextAlign.Center,
             style = textStyle
         )
@@ -50,7 +51,8 @@ fun ErrorViewPreview() {
     JokesForAllTheme {
         BoxWithConstraints {
             ErrorView(
-                isSoundOn = true
+                isSoundOn = true,
+                onToggleSound = {}
             ) {}
         }
     }

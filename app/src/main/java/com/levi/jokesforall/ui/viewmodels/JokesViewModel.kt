@@ -4,116 +4,134 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.levi.jokesforall.data.remote.Result
 import com.levi.jokesforall.domain.model.Joke
-import com.levi.jokesforall.domain.model.JokeType
+import com.levi.jokesforall.domain.repository.PreferencesRepository
 import com.levi.jokesforall.domain.repository.JokesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel
-class JokesViewModel @Inject constructor(private val repository: JokesRepository) : ViewModel() {
-    private val _uiState = MutableStateFlow<JokesScreenUiState>(JokesScreenUiState.Loading)
-    val uiState: StateFlow<JokesScreenUiState> = _uiState.asStateFlow()
+class JokesViewModel @Inject constructor(
+    private val jokesRepository: JokesRepository,
+    private val preferencesRepository: PreferencesRepository
+) : ViewModel() {
+    private val _refreshJokeState = MutableStateFlow<RefreshJokesState>(RefreshJokesState.Idle)
+    private val _shouldDisplayPunchline = MutableStateFlow(false)
 
-    private var currentJokeIndex = -1
-    private val jokes = mutableListOf<Joke>()
-    val isSoundOn = true
+    val uiState: StateFlow<JokesScreenUiState> = jokesScreenUiState(
+        preferencesRepository = preferencesRepository,
+        jokesRepository = jokesRepository,
+        refreshJokesState = _refreshJokeState,
+        shouldDisplayPunchline = _shouldDisplayPunchline
+    ).stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = JokesScreenUiState(isSoundOn = false)
+    )
 
-    init {
-        nextJoke()
+    fun setHasSeenIntro() {
+        viewModelScope.launch {
+            preferencesRepository.setHasSeenIntro()
+        }
+    }
+
+    fun refreshJokes() {
+        viewModelScope.launch {
+            when (jokesRepository.refreshJokes()) {
+                is Result.Success -> _refreshJokeState.value = RefreshJokesState.Idle
+                is Result.Error -> _refreshJokeState.value = RefreshJokesState.Error
+            }
+        }
+    }
+
+    fun displayPunchline() {
+        _shouldDisplayPunchline.update { true }
+    }
+
+    fun hidePunchline() {
+        _shouldDisplayPunchline.update { false }
     }
 
     fun nextJoke() {
         viewModelScope.launch {
-            currentJokeIndex++
-            if (jokes.isEmpty() || currentJokeIndex >= jokes.size) {
-                refreshJokes()
-            } else {
-                _uiState.update { state ->
-                    val currentJoke = jokes[currentJokeIndex]
-                    repository.markJokeAsSeen(currentJoke.id)
-                    uiStateFromJokeType(currentJoke, currentJokeIndex > 0)
-                }
+            uiState.value.currentJoke?.let { joke ->
+                jokesRepository.markJokeAsSeen(joke.id)
+                hidePunchline()
             }
         }
     }
 
-    private suspend fun refreshJokes() {
-        _uiState.update { JokesScreenUiState.Loading }
-        when (val result = repository.getJokes()) {
-            is Result.Success -> {
-                _uiState.update {
-                    jokes.clear()
-                    jokes.addAll(result.data)
-                    currentJokeIndex = 0
-                    val currentJoke = jokes[currentJokeIndex]
-                    repository.markJokeAsSeen(currentJoke.id)
-                    uiStateFromJokeType(currentJoke)
-                }
-            }
-
-            is Result.Error -> {
-                _uiState.update { JokesScreenUiState.Error }
-            }
+    fun toggleSound(isSoundOn: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setSoundOn(!isSoundOn)
         }
     }
-
-    fun previousJoke() {
-        if (currentJokeIndex <= 0) {
-            return
-        }
-        currentJokeIndex--
-        _uiState.update { state ->
-            val joke = jokes[currentJokeIndex]
-            uiStateFromJokeType(joke, currentJokeIndex > 0)
-        }
-    }
-
-    fun showDelivery() {
-        _uiState.update { state ->
-            if (state is JokesScreenUiState.TwoPartJoke) {
-                state.copy(canShowDelivery = true)
-            } else {
-                state
-            }
-        }
-    }
-
-    fun toggleSound() {
-        // TODO: implement toggle sound
-    }
-
 }
 
-sealed interface JokesScreenUiState {
-    val canGoBack: Boolean
+private fun jokesScreenUiState(
+    preferencesRepository: PreferencesRepository,
+    jokesRepository: JokesRepository,
+    refreshJokesState: MutableStateFlow<RefreshJokesState>,
+    shouldDisplayPunchline: MutableStateFlow<Boolean>
+): Flow<JokesScreenUiState> {
 
-    data object Loading : JokesScreenUiState {
-        override val canGoBack: Boolean = false
+    val userPreferences = preferencesRepository.observeUserPreferences
+    val jokes = jokesRepository.observeAllUnseenJokes
+
+    return combine(
+        userPreferences,
+        jokes,
+        refreshJokesState,
+        shouldDisplayPunchline
+    ) { preferences, jokes, refreshState, shouldDisplayPunchline ->
+
+        if (!preferences.hasSeenIntro) {
+            return@combine JokesScreenUiState(
+                isSoundOn = preferences.isSoundOn,
+                shouldDisplayIntro = true
+            )
+        }
+
+        if (jokes.isNotEmpty()) {
+            return@combine JokesScreenUiState(
+                currentJoke = jokes.first(),
+                shouldDisplayPunchline = shouldDisplayPunchline,
+                isSoundOn = preferences.isSoundOn
+            )
+        }
+
+        when (refreshState) {
+            is RefreshJokesState.Idle -> JokesScreenUiState(
+                shouldRefresh = true,
+                isSoundOn = preferences.isSoundOn,
+            )
+
+            is RefreshJokesState.Error -> JokesScreenUiState(
+                hasError = true,
+                isSoundOn = preferences.isSoundOn
+            )
+        }
     }
-
-    data object Error : JokesScreenUiState {
-        override val canGoBack: Boolean = false
-    }
-
-    data class SinglePartJoke(
-        val joke: Joke,
-        override val canGoBack: Boolean = false
-    ) : JokesScreenUiState
-
-    data class TwoPartJoke(
-        val joke: Joke,
-        val canShowDelivery: Boolean = false,
-        override val canGoBack: Boolean = false
-    ) : JokesScreenUiState
 }
 
-private fun uiStateFromJokeType(joke: Joke, canGoBack: Boolean = false): JokesScreenUiState =
-    when (joke.type) {
-        JokeType.SINGLE -> JokesScreenUiState.SinglePartJoke(joke = joke, canGoBack = canGoBack)
-        JokeType.TWOPART -> JokesScreenUiState.TwoPartJoke(joke = joke, canGoBack = canGoBack)
-    }
+
+private sealed interface RefreshJokesState {
+    data object Idle : RefreshJokesState
+    data object Error : RefreshJokesState
+}
+
+data class JokesScreenUiState(
+    val isSoundOn: Boolean,
+    val shouldDisplayIntro: Boolean = false,
+    val shouldRefresh: Boolean = false,
+    val hasError: Boolean = false,
+    val shouldDisplayPunchline: Boolean = false,
+    val currentJoke: Joke? = null
+)

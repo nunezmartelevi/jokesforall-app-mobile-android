@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.levi.jokesforall.data.model.JokeEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface JokeDao {
@@ -15,7 +16,7 @@ interface JokeDao {
     suspend fun deleteAll()
 
     @Query("SELECT * FROM jokes WHERE seen = 0")
-    fun loadAllUnseenJokes(): List<JokeEntity>
+    fun loadAllUnseenJokes(): Flow<List<JokeEntity>>
 
     @Query("UPDATE jokes SET seen = 1 WHERE id = :id")
     fun markAsSeen(id: Int)

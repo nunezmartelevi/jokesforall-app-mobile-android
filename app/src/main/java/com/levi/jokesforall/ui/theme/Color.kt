@@ -3,6 +3,7 @@ package com.levi.jokesforall.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val Wood = Color(0xFF5D3118)
-val DarkGrey = Color(0xFF222222)
-
-val GreenTerminal = Color(0xFF008000)
+val LightBlack = Color(0xFF2e312b)
+val DarkGrey = Color(0xFF1d211a)
+val BrightGreenTerminal = Color(0xFF8EBF73)
+val DarkGreenTerminal = Color(0xFF7AA860)

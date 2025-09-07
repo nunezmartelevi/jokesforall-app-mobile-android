@@ -1,5 +1,6 @@
 package com.levi.jokesforall.ui.theme
 
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -9,36 +10,27 @@ import androidx.compose.ui.unit.sp
 import com.levi.jokesforall.R
 
 val adobeDia = FontFamily(
-    Font(R.font.adobe_dia, FontWeight.Normal),
-    Font(R.font.adobe_dia, FontWeight.Medium),
-    Font(R.font.adobe_dia, FontWeight.Bold)
+    Font(R.font.adobe_dia, FontWeight.Normal)
+)
+val boldPixels = FontFamily(
+    Font(R.font.bold_pixels, FontWeight.Bold)
 )
 
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(
-        fontFamily = adobeDia,
-        fontWeight = FontWeight.Normal,
-        fontSize = 32.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp,
-        color = GreenTerminal
-    ),
-    bodyMedium = TextStyle(
-        fontFamily = adobeDia,
+        fontFamily = boldPixels,
         fontWeight = FontWeight.Normal,
         fontSize = 24.sp,
         lineHeight = 24.sp,
-        letterSpacing = 0.5.sp,
-        color = GreenTerminal
+        letterSpacing = 0.5.sp
     ),
-    bodySmall = TextStyle(
-        fontFamily = adobeDia,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
+    bodyMedium = TextStyle(
+        fontFamily = boldPixels,
+        fontWeight = FontWeight.Bold,
+        fontSize = 18.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp,
-        color = GreenTerminal
     )
     /* Other default text styles to override
     titleLarge = TextStyle(
