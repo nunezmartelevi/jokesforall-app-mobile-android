@@ -6,14 +6,18 @@ import com.levi.jokesforall.data.model.asDomainModel
 import com.levi.jokesforall.data.remote.Dispatcher
 import com.levi.jokesforall.data.remote.JokesDispatchers.IO
 import com.levi.jokesforall.data.remote.JokesService
-import com.levi.jokesforall.data.remote.Result
 import com.levi.jokesforall.domain.model.Joke
 import com.levi.jokesforall.domain.repository.JokesRepository
 import com.levi.jokesforall.domain.repository.Syncable
-import com.levi.jokesforall.domain.repository.SyncingDataException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import com.levi.jokesforall.data.remote.Result
+import com.levi.jokesforall.domain.repository.NoInternetException
+import com.levi.jokesforall.domain.repository.SyncingDataException
 
 class OfflineFirstJokesRepository @Inject constructor(
     private val remoteDataSource: JokesService,
@@ -21,42 +25,37 @@ class OfflineFirstJokesRepository @Inject constructor(
     @param:Dispatcher(IO) private val dispatcher: CoroutineDispatcher
 ) : JokesRepository, Syncable {
 
-    override suspend fun getJokes(): Result<List<Joke>> {
+    override val observeAllUnseenJokes: Flow<List<Joke>> =
+        localDataSource.loadAllUnseenJokes()
+            .map { cachedJokes ->
+                cachedJokes.asDomainModel()
+            }
+            .flowOn(dispatcher)
+
+    override suspend fun refreshJokes(): Result<Unit> {
         return withContext(dispatcher) {
             try {
-                val jokesFromCache = localDataSource.loadAllUnseenJokes()
-                val isCacheEmptyOrAllJokesSeen =
-                    jokesFromCache.isEmpty() || jokesFromCache.all { it.seen }
-                when {
-                    isCacheEmptyOrAllJokesSeen -> {
-                        val wasSyncSuccessful = sync()
-                        if (wasSyncSuccessful) {
-                            val newJokes = localDataSource.loadAllUnseenJokes().asDomainModel()
-                            Result.Success(newJokes)
-                        } else {
-                            Result.Error(SyncingDataException())
-                        }
-                    }
-
-                    else -> {
-                        Result.Success(jokesFromCache.asDomainModel())
-                    }
+                val wasSyncSuccessful = sync()
+                if (wasSyncSuccessful) {
+                    Result.Success(Unit)
+                } else {
+                    Result.Error(SyncingDataException())
                 }
-            } catch (exception: Exception) {
-                Result.Error(exception)
+            } catch (_: Exception) {
+                Result.Error(NoInternetException())
             }
         }
     }
 
     override suspend fun sync(): Boolean {
         val response = remoteDataSource.getJokes()
-        if (response.isSuccessful) {
+        return if (response.isSuccessful) {
             val jokes = response.body()?.jokes ?: emptyList()
             localDataSource.deleteAll()
             val rowIds = localDataSource.insertJokes(jokes.asDatabaseModel())
-            return rowIds.all { it > 0 }
+            rowIds.any { it > 0 }
         } else {
-            return false
+            false
         }
     }
 

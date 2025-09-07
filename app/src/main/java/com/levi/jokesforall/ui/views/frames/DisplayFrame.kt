@@ -2,6 +2,10 @@ package com.levi.jokesforall.ui.views.frames
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
@@ -24,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -34,7 +39,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.levi.jokesforall.R
-import com.levi.jokesforall.ui.theme.DarkGrey
+import com.levi.jokesforall.ui.theme.BrightGreenTerminal
 import com.levi.jokesforall.ui.theme.JokesForAllTheme
 import com.levi.jokesforall.util.PIXEL_4_VIEW_PORT
 import kotlinx.coroutines.delay
@@ -42,61 +47,62 @@ import java.text.BreakIterator
 import java.text.StringCharacterIterator
 
 @Composable
-fun TextFrame(
+fun DisplayFrame(
     modifier: Modifier = Modifier,
     maxHeight: Dp,
     isSoundOn: Boolean,
-    mainContentText: String,
+    mainText: String,
+    textAnimationSpeed: TextAnimationSpeed = TextAnimationSpeed.Normal,
+    onTextAnimationEnd: () -> Unit = {},
     footerContent: @Composable (RowScope.(TextStyle) -> Unit) = {}
 ) {
     val calculatedFrameHeight = (maxHeight.value * 0.57).dp
-    val text = mainContentText
-    val breakIterator = remember(text) { BreakIterator.getCharacterInstance() }
-    val typingDelayInMs = 50L
-    var substringText by remember { mutableStateOf("") }
-    var shouldDisplayFooterText by remember { mutableStateOf(false) }
-
-    LaunchedEffect(text) {
-        shouldDisplayFooterText = false
-        breakIterator.text = StringCharacterIterator(text)
-        var nextIndex = breakIterator.next()
-        while (nextIndex != BreakIterator.DONE) {
-            substringText = text.subSequence(0, nextIndex).toString()
-            nextIndex = breakIterator.next()
-            delay(typingDelayInMs)
-        }
-        delay(100)
-        shouldDisplayFooterText = true
-    }
+    var shouldDisplayFooterContent by remember { mutableStateOf(false) }
 
     ConstraintLayout(
         modifier = modifier
-            .background(DarkGrey)
             .height(calculatedFrameHeight)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(10.dp)
     ) {
-        val (header, mainText, footer) = createRefs()
+        val (header, centerText, footer) = createRefs()
+
         Header(
             modifier = Modifier.constrainAs(header) {
                 top.linkTo(parent.top)
             },
             isSoundOn = isSoundOn
         )
-        MainContent(
-            modifier = Modifier.constrainAs(mainText) {
+
+        CenterText(
+            modifier = Modifier.constrainAs(centerText) {
                 top.linkTo(header.bottom)
                 bottom.linkTo(footer.top)
             },
-            text = substringText
+            text = mainText,
+            textAnimationSpeed = textAnimationSpeed,
+            onAnimationStart = { shouldDisplayFooterContent = false },
+            onAnimationEnd = {
+                shouldDisplayFooterContent = true
+                onTextAnimationEnd()
+            }
         )
+
         Footer(
             modifier = Modifier
                 .constrainAs(footer) {
                     bottom.linkTo(parent.bottom)
                 },
-            isVisible = shouldDisplayFooterText
+            isVisible = shouldDisplayFooterContent
         ) {
-            val textStyle = MaterialTheme.typography.bodyMedium
+            val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
+            val animatedColor by infiniteTransition.animateColor(
+                initialValue = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                targetValue = MaterialTheme.colorScheme.onSurface.copy(alpha = 1f),
+                animationSpec = infiniteRepeatable(tween(500), RepeatMode.Reverse),
+                label = "color"
+            )
+            val textStyle = MaterialTheme.typography.bodyMedium.copy(color = animatedColor)
             footerContent(textStyle)
         }
     }
@@ -115,23 +121,49 @@ private fun Header(
         Image(
             painter = painterResource(soundIcon),
             modifier = Modifier.size(20.dp),
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
             contentDescription = null
         )
         Spacer(modifier = Modifier.weight(1f))
-        Image(painter = painterResource(R.drawable.ic_battery_full), null)
+        Image(
+            painter = painterResource(R.drawable.ic_battery_full),
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
+            contentDescription = null
+        )
     }
 }
 
 @Composable
-private fun MainContent(
+private fun CenterText(
     modifier: Modifier = Modifier,
-    text: String
+    text: String,
+    textAnimationSpeed: TextAnimationSpeed,
+    onAnimationStart: () -> Unit,
+    onAnimationEnd: () -> Unit
 ) {
+    val breakIterator = remember(text) { BreakIterator.getCharacterInstance() }
+    val typingDelayInMs = textAnimationSpeed.value
+    var substringText by remember { mutableStateOf("") }
+
+    LaunchedEffect(text) {
+        onAnimationStart()
+        breakIterator.text = StringCharacterIterator(text)
+        var nextIndex = breakIterator.next()
+        while (nextIndex != BreakIterator.DONE) {
+            substringText = text.subSequence(0, nextIndex).toString()
+            nextIndex = breakIterator.next()
+            delay(typingDelayInMs)
+        }
+        delay(100)
+        onAnimationEnd()
+    }
+
     Text(
         modifier = modifier.fillMaxWidth(),
-        text = text,
+        text = substringText,
         textAlign = TextAlign.Center,
-        style = MaterialTheme.typography.bodyLarge
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurface
     )
 }
 
@@ -161,14 +193,14 @@ private fun Footer(
 @Composable
 private fun TextFramePreview() {
     JokesForAllTheme {
-        TextFrame(
+        DisplayFrame(
             maxHeight = PIXEL_4_VIEW_PORT.second,
             isSoundOn = false,
-            mainContentText = "This is a joke",
+            mainText = "This is a joke",
             footerContent = {
                 Text(
                     modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(R.string.continue_next_joke),
+                    text = stringResource(R.string.action_next_joke),
                     textAlign = TextAlign.Center,
                     style = it
                 )

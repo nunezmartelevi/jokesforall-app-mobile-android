@@ -4,32 +4,40 @@ import com.levi.jokesforall.data.remote.Result
 import com.levi.jokesforall.domain.model.Joke
 import com.levi.jokesforall.domain.model.JokeType
 import com.levi.jokesforall.domain.repository.JokesRepository
-import com.levi.jokesforall.jokes
 import com.levi.jokesforall.singlePartJokes
 import com.levi.jokesforall.twoPartJokes
+import com.levi.jokesforall.jokes
+import kotlinx.coroutines.flow.Flow
 
 class FakeJokesRepository(
     private val isSuccessful: Boolean = true,
-    type: JokeType? = null
+    val type: JokeType? = null
 ) : JokesRepository {
-    private val unSeenJokes: MutableList<Joke> = type?.let {
-        when(it)   {
-            JokeType.SINGLE -> singlePartJokes.toMutableList()
-            JokeType.TWOPART -> twoPartJokes.toMutableList()
-        }
-    }?: jokes.toMutableList()
+    private val jokesList: MutableList<Joke> = jokes.toMutableList()
 
-    override suspend fun getJokes(): Result<List<Joke>> {
+    suspend fun getJoke(): Result<Joke> {
         return if (isSuccessful) {
-            Result.Success(unSeenJokes)
+            val joke = when (type) {
+                JokeType.SINGLE -> singlePartJokes.first()
+                JokeType.TWOPART -> twoPartJokes.first()
+                else -> jokes.first()
+            }
+            Result.Success(joke)
         } else {
             Result.Error(Exception("Error"))
         }
     }
 
+    override val observeAllUnseenJokes: Flow<Joke>
+        get() = TODO("Not yet implemented")
+
     override suspend fun markJokeAsSeen(id: Int) {
-        unSeenJokes.firstOrNull { it.id == id }?.let { joke ->
-            unSeenJokes.remove(joke)
+        jokesList.firstOrNull { it.id == id }?.let { joke ->
+            jokesList.remove(joke)
         }
+    }
+
+    override suspend fun sync(): Boolean {
+        TODO("Not yet implemented")
     }
 }
