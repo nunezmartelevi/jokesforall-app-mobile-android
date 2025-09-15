@@ -1,5 +1,6 @@
 package com.levi.jokesforall.ui.viewmodels
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.levi.jokesforall.data.remote.Result
@@ -22,7 +23,7 @@ class JokesViewModel @Inject constructor(
     private val jokesRepository: JokesRepository,
     private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
-    private val _refreshJokeState = MutableStateFlow<RefreshJokesState>(RefreshJokesState.Idle)
+    private val _refreshJokeState = MutableStateFlow<RefreshJokesState>(RefreshJokesState.NotStarted)
     private val _shouldDisplayPunchline = MutableStateFlow(false)
 
     val uiState: StateFlow<JokesScreenUiState> = jokesScreenUiState(
@@ -45,7 +46,7 @@ class JokesViewModel @Inject constructor(
     fun refreshJokes() {
         viewModelScope.launch {
             when (jokesRepository.refreshJokes()) {
-                is Result.Success -> _refreshJokeState.value = RefreshJokesState.Idle
+                is Result.Success -> _refreshJokeState.value = RefreshJokesState.NotStarted
                 is Result.Error -> _refreshJokeState.value = RefreshJokesState.Error
             }
         }
@@ -108,7 +109,7 @@ private fun jokesScreenUiState(
         }
 
         when (refreshState) {
-            is RefreshJokesState.Idle -> JokesScreenUiState(
+            is RefreshJokesState.NotStarted -> JokesScreenUiState(
                 shouldRefresh = true,
                 isSoundOn = preferences.isSoundOn,
             )
@@ -123,7 +124,7 @@ private fun jokesScreenUiState(
 
 
 private sealed interface RefreshJokesState {
-    data object Idle : RefreshJokesState
+    data object NotStarted : RefreshJokesState
     data object Error : RefreshJokesState
 }
 

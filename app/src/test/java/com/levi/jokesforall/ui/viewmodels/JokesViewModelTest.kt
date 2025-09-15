@@ -1,60 +1,105 @@
 package com.levi.jokesforall.ui.viewmodels
 
-import com.levi.jokesforall.domain.model.JokeType
 import com.levi.jokesforall.domain.repository.JokesRepository
-import com.levi.jokesforall.jokes
+import com.levi.jokesforall.domain.repository.PreferencesRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNotSame
+import kotlin.test.assertTrue
 
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class JokesViewModelTest {
 
-//    @get:Rule
-//    val mainDispatcherRule = MainDispatcherRule()
-//    lateinit var repository: JokesRepository
-//    lateinit var viewModel: JokesViewModel
-//
-//    @Test
-//    fun `nextJoke updates the UI state to SinglePartJoke`() = runTest {
-//        repository = FakeJokesRepository(type = JokeType.SINGLE)
-//        viewModel = JokesViewModel(repository)
-//        assert(viewModel.uiState.value is JokesScreenUiState.SinglePartJoke)
-//    }
-//
-//    @Test
-//    fun `nextJoke updates the UI state to TwoPartJoke`() = runTest {
-//        repository = FakeJokesRepository(type = JokeType.TWOPART)
-//        viewModel = JokesViewModel(repository)
-//        assert(viewModel.uiState.value is JokesScreenUiState.TwoPartJoke)
-//    }
-//
-//    @Test
-//    fun `nextJoke returns an error when repository fails`() = runTest {
-//        repository = FakeJokesRepository(isSuccessful = false)
-//        viewModel = JokesViewModel(repository)
-//        assert(viewModel.uiState.value is JokesScreenUiState.Error)
-//    }
-//
-//    @Test
-//    fun `previousJoke updates the UI state with the previous joke`() = runTest {
-//        repository = FakeJokesRepository()
-//        viewModel = JokesViewModel(repository)
-//        // Advance until the second joke is loaded
-//        viewModel.nextJoke()
-//        val secondJokeId = jokes[1].id
-//        assert((viewModel.uiState.value as JokesScreenUiState.SinglePartJoke).joke.id == secondJokeId)
-//        // Go back to the first joke
-//        viewModel.previousJoke()
-//        val firstJokeId = jokes[0].id
-//        assert((viewModel.uiState.value as JokesScreenUiState.TwoPartJoke).joke.id == firstJokeId)
-//    }
-//
-//    @Test
-//    fun `showDelivery updates the UI state to show the delivery`() {
-//        repository = FakeJokesRepository(type = JokeType.TWOPART)
-//        viewModel = JokesViewModel(repository)
-//        viewModel.showDelivery()
-//        assert((viewModel.uiState.value as JokesScreenUiState.TwoPartJoke).canShowDelivery)
-//    }
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
+    lateinit var jokesRepository: JokesRepository
+    lateinit var preferencesRepository: PreferencesRepository
+    lateinit var viewModel: JokesViewModel
+
+    @Before
+    fun setup() {
+        jokesRepository = FakeJokesRepository()
+        preferencesRepository = FakeUserPreferencesRepository()
+        viewModel = JokesViewModel(jokesRepository, preferencesRepository)
+    }
+
+    @Test
+    fun `setHasSeenIntro updates shouldDisplayIntro to false`() = runTest {
+        viewModel = JokesViewModel(
+            jokesRepository,
+            FakeUserPreferencesRepository(false)
+        )
+        val initialState = viewModel.uiState.first()
+        assertTrue(initialState.shouldDisplayIntro)
+        viewModel.setHasSeenIntro()
+        advanceUntilIdle()
+        val updatedState = viewModel.uiState.first()
+        assertFalse(updatedState.shouldDisplayIntro)
+    }
+
+    @Test
+    fun `refreshJokes sets currentJoke`() = runTest {
+        viewModel.refreshJokes()
+        val uiState = viewModel.uiState.first()
+        assertNotNull(uiState.currentJoke)
+    }
+
+    @Test
+    fun `refreshJokes when result is error set RefreshJokeState to Error`() = runTest {
+        viewModel = JokesViewModel(
+            FakeJokesRepository(false),
+            preferencesRepository
+        )
+        viewModel.refreshJokes()
+        val uiState = viewModel.uiState.first()
+        assertTrue(uiState.hasError)
+    }
+
+    @Test
+    fun `displayPunchline sets shouldDisplayPunchline to true`() = runTest {
+        viewModel.refreshJokes()
+        viewModel.displayPunchline()
+        val uiState = viewModel.uiState.first()
+        assertTrue(uiState.shouldDisplayPunchline)
+    }
+
+    @Test
+    fun `hidePunchline sets shouldDisplayPunchline to false`() = runTest {
+        viewModel.refreshJokes()
+        viewModel.displayPunchline()
+        val initialState = viewModel.uiState.first()
+        assertTrue(initialState.shouldDisplayPunchline)
+        viewModel.hidePunchline()
+        val updatedState = viewModel.uiState.first()
+        assertFalse(updatedState.shouldDisplayPunchline)
+    }
+
+    @Test
+    fun `nextJoke updates currentJoke`() = runTest {
+        viewModel.refreshJokes()
+        val initialState = viewModel.uiState.first()
+        viewModel.nextJoke()
+        advanceUntilIdle()
+        val updatedState = viewModel.uiState.first()
+        assertNotSame(initialState.currentJoke, updatedState.currentJoke)
+    }
+
+    @Test
+    fun `toggleSound updates isSoundOn`() = runTest {
+        val initialState = viewModel.uiState.first()
+        assertTrue(initialState.isSoundOn)
+        viewModel.toggleSound(true)
+        advanceUntilIdle()
+        val updatedState = viewModel.uiState.first()
+        assertFalse(updatedState.isSoundOn)
+    }
 }

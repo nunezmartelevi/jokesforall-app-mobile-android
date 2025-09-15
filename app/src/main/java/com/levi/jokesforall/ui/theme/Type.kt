@@ -1,6 +1,5 @@
 package com.levi.jokesforall.ui.theme
 
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -9,9 +8,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.levi.jokesforall.R
 
-val adobeDia = FontFamily(
-    Font(R.font.adobe_dia, FontWeight.Normal)
-)
 val boldPixels = FontFamily(
     Font(R.font.bold_pixels, FontWeight.Bold)
 )

@@ -2,8 +2,10 @@ package com.levi.jokesforall.data.repository
 
 import com.levi.jokesforall.data.database.JokeDao
 import com.levi.jokesforall.data.remote.JokesService
+import com.levi.jokesforall.data.remote.Result
 import com.levi.jokesforall.domain.repository.JokesRepository
 import com.levi.jokesforall.remoteJokes
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -21,38 +23,51 @@ class OfflineFirstJokesRepositoryTest {
     }
 
     @Test
-    fun `getJoke when response is successful returns a joke`() = runTest {
+    fun `observeAllUnseenJokes returns the correct jokes`() = runTest {
         repository = OfflineFirstJokesRepository(
             service,
             dao,
             StandardTestDispatcher(testScheduler)
         )
-        val joke = repository.observeAllUnseenJokes.
-        assert(joke.id == remoteJokes.first().id)
+        repository.refreshJokes()
+        val unseenJokes = repository.observeAllUnseenJokes.first()
+        assert(unseenJokes.isNotEmpty())
     }
 
-//    @Test
-//    fun `getJoke when response is error returns an Error`() = runTest {
-//        service = FakeJokeService(isSuccessful = false)
-//        repository = OfflineFirstJokesRepository(
-//            service,
-//            dao,
-//            StandardTestDispatcher(testScheduler)
-//        )
-//        val result = repository.getJoke()
-//        assert(result is Result.Error)
-//    }
-//
-//    @Test
-//    fun `markJokeAsSeen updates the joke in the database`() = runTest {
-//        val jokeToMark = remoteJokes.first()
-//        repository = OfflineFirstJokesRepository(
-//            service,
-//            dao,
-//            StandardTestDispatcher(testScheduler)
-//        )
-//        repository.markJokeAsSeen(jokeToMark.id)
-//        val unSeenJokes = dao.loadAllUnseenJokes()
-//        assert(unSeenJokes.none { it.id == jokeToMark.id })
-//    }
+    @Test
+    fun `refreshJokes when sync is successful returns Success`() = runTest {
+        repository = OfflineFirstJokesRepository(
+            service,
+            dao,
+            StandardTestDispatcher(testScheduler)
+        )
+        val result = repository.refreshJokes()
+        assert(result is Result.Success)
+    }
+
+    @Test
+    fun `refreshJokes when sync is unsuccessful returns Error`() = runTest {
+        service = FakeJokeService(isSuccessful = false)
+        repository = OfflineFirstJokesRepository(
+            service,
+            dao,
+            StandardTestDispatcher(testScheduler)
+        )
+        val result = repository.refreshJokes()
+        assert(result is Result.Error)
+    }
+
+    @Test
+    fun `markJokeAsSeen updates the joke in the database`() = runTest {
+        val jokeToMark = remoteJokes.first()
+        repository = OfflineFirstJokesRepository(
+            service,
+            dao,
+            StandardTestDispatcher(testScheduler)
+        )
+        repository.refreshJokes()
+        repository.markJokeAsSeen(jokeToMark.id)
+        val unseenJokes = repository.observeAllUnseenJokes.first()
+        assert(unseenJokes.none { it.id == jokeToMark.id })
+    }
 }

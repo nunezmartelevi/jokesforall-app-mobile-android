@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.levi.jokesforall.R
-import com.levi.jokesforall.ui.theme.BrightGreenTerminal
 import com.levi.jokesforall.ui.theme.JokesForAllTheme
 import com.levi.jokesforall.util.PIXEL_4_VIEW_PORT
 import kotlinx.coroutines.delay
@@ -52,7 +51,7 @@ fun DisplayFrame(
     maxHeight: Dp,
     isSoundOn: Boolean,
     mainText: String,
-    textAnimationSpeed: TextAnimationSpeed = TextAnimationSpeed.Normal,
+    textAnimationSpeed: TextAnimationSpeed = TextAnimationSpeed.Fast,
     onTextAnimationEnd: () -> Unit = {},
     footerContent: @Composable (RowScope.(TextStyle) -> Unit) = {}
 ) {
@@ -63,7 +62,7 @@ fun DisplayFrame(
         modifier = modifier
             .height(calculatedFrameHeight)
             .background(MaterialTheme.colorScheme.surface)
-            .padding(10.dp)
+            .padding(horizontal = 16.dp, vertical = 10.dp)
     ) {
         val (header, centerText, footer) = createRefs()
 

@@ -2,7 +2,7 @@ package com.levi.jokesforall
 
 import com.levi.jokesforall.data.model.JokeEntity
 
-val jokesEntitiesTestData = listOf(
+val jokesEntities = listOf(
     JokeEntity(
         id = 135,
         category = "Pun",

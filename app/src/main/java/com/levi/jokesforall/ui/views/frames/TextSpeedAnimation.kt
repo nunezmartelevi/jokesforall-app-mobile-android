@@ -19,7 +19,9 @@ sealed interface TextAnimationSpeed {
         @Stable
         val Slow = Speed(100L)
         @Stable
-        val Normal = Speed(50L)
+        val Normal = Speed(75L)
+        @Stable
+        val Fast = Speed(50L)
     }
 
     @Immutable

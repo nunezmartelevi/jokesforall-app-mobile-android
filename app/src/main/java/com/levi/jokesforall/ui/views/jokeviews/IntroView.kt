@@ -1,6 +1,7 @@
 package com.levi.jokesforall.ui.views.jokeviews
 
 import android.view.WindowManager
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices.PIXEL_4
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.levi.jokesforall.R
 import com.levi.jokesforall.ui.views.frames.WoodFrame
 import com.levi.jokesforall.ui.views.frames.DisplayFrame
@@ -35,23 +37,37 @@ fun BoxWithConstraintsScope.IntroView(
     onContinuePress: () -> Unit
 ) {
     val introTexts: Array<String> = stringArrayResource(R.array.intro_array)
-    val state = rememberIntroState(introTexts.toList())
-    var isAnimating by remember { mutableStateOf(true) }
+    var isTextAnimationPlaying by remember { mutableStateOf(true) }
+    val introListState = rememberIntroListState(introTexts.toList())
     val context = LocalContext.current
+    val mediaPlayerState = rememberMediaPlayerState(context, R.raw.intro_music)
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(Unit) {
-        val window = (context as? androidx.activity.ComponentActivity)?.window
+        val window = (context as? ComponentActivity)?.window
         window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        lifecycleOwner.lifecycle.addObserver(mediaPlayerState)
+        mediaPlayerState.startOrResumePlayback()
 
         onDispose {
             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            mediaPlayerState.clearMediaPlayer()
+            lifecycleOwner.lifecycle.removeObserver(mediaPlayerState)
         }
     }
 
-    LaunchedEffect(isAnimating) {
-        if (!isAnimating) {
-            state.nextIntroText()
-            isAnimating = true
+    LaunchedEffect(isTextAnimationPlaying) {
+        if (!isTextAnimationPlaying) {
+            introListState.nextText()
+            isTextAnimationPlaying = true
+        }
+    }
+
+    LaunchedEffect(isSoundOn) {
+        if (isSoundOn) {
+            mediaPlayerState.unMute()
+        } else {
+            mediaPlayerState.mute()
         }
     }
 
@@ -59,7 +75,7 @@ fun BoxWithConstraintsScope.IntroView(
         modifier = modifier,
         maxWidth = maxWidth,
         maxHeight = maxHeight,
-        onAButtonPress = { if (state.introEnded) onContinuePress() },
+        onAButtonPress = { if (introListState.finished) onContinuePress() },
         onSoundButtonPress = { onToggleSound(isSoundOn) }
     )
 
@@ -67,11 +83,11 @@ fun BoxWithConstraintsScope.IntroView(
         modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
         maxHeight = maxHeight,
         isSoundOn = isSoundOn,
-        mainText = state.text,
+        mainText = introListState.text,
         textAnimationSpeed = TextAnimationSpeed.Slow,
-        onTextAnimationEnd = { isAnimating = false }
+        onTextAnimationEnd = { isTextAnimationPlaying = false }
     ) { textStyle ->
-        if (state.introEnded) {
+        if (introListState.finished) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(R.string.action_continue),
@@ -94,27 +110,22 @@ fun IntroViewPreview() {
 }
 
 @Composable
-fun rememberIntroState(textList: List<String>): IntroState {
-    return remember { IntroState(textList) }
-}
+fun rememberIntroListState(textList: List<String>): IntroListState =
+    remember { IntroListState(textList) }
 
 @Stable
-class IntroState(private val textList: List<String>) {
-    private val delayTimeInMillis = 1000L
+class IntroListState(private val textList: List<String>) {
     private var currentTextIndex = 0
     var text = textList.firstOrNull() ?: ""
         private set
-    var introEnded = false
+    var finished = false
         private set
+    private val delayTimeInMillis = 1000L
 
-    init {
-        require(textList.isNotEmpty()) { "textList cannot be empty" }
-    }
-
-    suspend fun nextIntroText() {
+    suspend fun nextText() {
         currentTextIndex++
         if (currentTextIndex >= textList.size) {
-            introEnded = true
+            finished = true
         } else {
             delay(delayTimeInMillis)
             text = textList[currentTextIndex]

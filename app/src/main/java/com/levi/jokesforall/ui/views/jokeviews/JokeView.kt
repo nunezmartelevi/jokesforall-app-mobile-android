@@ -6,15 +6,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.levi.jokesforall.R
 import com.levi.jokesforall.domain.model.Joke
 import com.levi.jokesforall.domain.model.JokeType
@@ -35,26 +39,55 @@ fun BoxWithConstraintsScope.JokeView(
     onHidePunchline: () -> Unit,
     onToggleSound: (Boolean) -> Unit
 ) {
-    val mainContentText = if (shouldDisplayPunchline) joke.delivery ?: "" else joke.setup
-    var allowButtonInteraction by remember { mutableStateOf(false) }
+    val jokeText = if (shouldDisplayPunchline) joke.delivery else joke.setup
+    var isTextAnimationPlaying by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val mediaPlayerState = rememberMediaPlayerState(context, R.raw.text_animation_sound)
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(Unit) {
+        lifecycleOwner.lifecycle.addObserver(mediaPlayerState)
+        onDispose {
+            mediaPlayerState.clearMediaPlayer()
+            lifecycleOwner.lifecycle.removeObserver(mediaPlayerState)
+        }
+    }
+
+    LaunchedEffect(isTextAnimationPlaying) {
+        if (isTextAnimationPlaying) {
+            mediaPlayerState.startOrResumePlayback()
+            mediaPlayerState.setEnabled(true)
+        } else {
+            mediaPlayerState.pauseAndReset()
+            mediaPlayerState.setEnabled(false)
+        }
+    }
+
+    LaunchedEffect(isSoundOn) {
+        if (isSoundOn) {
+            mediaPlayerState.unMute()
+        } else {
+            mediaPlayerState.mute()
+        }
+    }
 
     WoodFrame(
         modifier = modifier,
         maxWidth = maxWidth,
         maxHeight = maxHeight,
         onAButtonPress = {
-            if (allowButtonInteraction) {
+            if (!isTextAnimationPlaying) {
                 when (joke.type) {
                     JokeType.SINGLE -> onNextJoke()
                     JokeType.TWOPART -> if (shouldDisplayPunchline) onNextJoke() else onDisplayPunchline()
                 }
-                allowButtonInteraction = false
+                isTextAnimationPlaying = true
             }
         },
         onBButtonPress = {
-            if (allowButtonInteraction && shouldDisplayPunchline) {
+            if (!isTextAnimationPlaying && shouldDisplayPunchline) {
                 onHidePunchline()
-                allowButtonInteraction = false
+                isTextAnimationPlaying = true
             }
         },
         onSoundButtonPress = { onToggleSound(isSoundOn) }
@@ -64,10 +97,10 @@ fun BoxWithConstraintsScope.JokeView(
         modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
         maxHeight = maxHeight,
         isSoundOn = isSoundOn,
-        mainText = mainContentText,
-        onTextAnimationEnd = { allowButtonInteraction = true }
+        mainText = jokeText ?: "",
+        onTextAnimationEnd = { isTextAnimationPlaying = false }
     ) { textStyle ->
-        if (allowButtonInteraction)
+        if (!isTextAnimationPlaying)
             when (joke.type) {
                 JokeType.SINGLE -> {
                     Spacer(modifier = Modifier.weight(1f))
