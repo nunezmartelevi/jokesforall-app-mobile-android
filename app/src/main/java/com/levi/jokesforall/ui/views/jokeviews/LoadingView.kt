@@ -14,6 +14,7 @@ import com.levi.jokesforall.R
 import com.levi.jokesforall.ui.theme.JokesForAllTheme
 import com.levi.jokesforall.ui.views.frames.WoodFrame
 import com.levi.jokesforall.ui.views.frames.DisplayFrame
+import com.levi.jokesforall.ui.views.frames.TextAnimationSpeed
 import com.levi.jokesforall.util.calculateTextFramePadding
 
 @Composable
@@ -33,7 +34,8 @@ fun BoxWithConstraintsScope.LoadingView(
         modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
         maxHeight = maxHeight,
         isSoundOn = isSoundOn,
-        mainText = stringResource(R.string.loading_message)
+        mainText = stringResource(R.string.loading_message),
+        textAnimationSpeed = TextAnimationSpeed.Normal
     ) { textStyle ->
         Text(
             modifier = Modifier.fillMaxWidth(),

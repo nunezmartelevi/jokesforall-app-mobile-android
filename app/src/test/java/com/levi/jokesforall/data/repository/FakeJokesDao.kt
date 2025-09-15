@@ -2,18 +2,15 @@ package com.levi.jokesforall.data.repository
 
 import com.levi.jokesforall.data.database.JokeDao
 import com.levi.jokesforall.data.model.JokeEntity
-import com.levi.jokesforall.data.model.asDatabaseModel
-import com.levi.jokesforall.localJokes
-import com.levi.jokesforall.remoteJokes
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flow
 
 class FakeJokesDao : JokeDao {
 
     private val jokeEntities = mutableListOf<JokeEntity>()
 
     override suspend fun insertJokes(jokes: List<JokeEntity>): List<Long> {
-        jokeEntities.addAll(localJokes)
+        jokeEntities.addAll(jokes)
         return jokeEntities.map { it.id.toLong() }
     }
 
@@ -21,8 +18,8 @@ class FakeJokesDao : JokeDao {
         jokeEntities.clear()
     }
 
-    override fun loadAllUnseenJokes(): Flow<List<JokeEntity>> {
-        return flowOf(jokeEntities.filter { !it.seen })
+    override fun loadAllUnseenJokes(): Flow<List<JokeEntity>> = flow {
+        emit(jokeEntities.filter { !it.seen })
     }
 
     override fun markAsSeen(id: Int) {

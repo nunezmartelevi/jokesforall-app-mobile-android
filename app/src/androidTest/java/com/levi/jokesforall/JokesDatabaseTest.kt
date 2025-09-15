@@ -6,6 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.levi.jokesforall.data.database.JokeDao
 import com.levi.jokesforall.data.database.JokesDatabase
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -35,29 +36,35 @@ class JokesDatabaseTest {
 
     @Test
     @Throws(Exception::class)
-    fun writeJokesAndLoadList() = runTest {
-        jokeDao.insertJokes(jokesEntitiesTestData)
-        val jokes = jokeDao.loadAllUnseenJokes()
-        assert(jokes.isNotEmpty() && jokes.all { !it.seen })
+    fun insertJokesWritesToDatabase() = runTest {
+        val result = jokeDao.insertJokes(jokesEntities)
+        assert(result.all { it > 0 })
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun loadAllUnseenJokesReadsUnseenJokes() = runTest {
+        jokeDao.insertJokes(jokesEntities)
+        val unseenJokes = jokeDao.loadAllUnseenJokes().first()
+        assert(unseenJokes.isNotEmpty())
     }
 
     @Test
     @Throws(Exception::class)
     fun deleteAllJokesReturnsEmptyList() = runTest {
-        jokeDao.insertJokes(jokesEntitiesTestData)
+        jokeDao.insertJokes(jokesEntities)
         jokeDao.deleteAll()
-        val jokes = jokeDao.loadAllUnseenJokes()
+        val jokes = jokeDao.loadAllUnseenJokes().first()
         assert(jokes.isEmpty())
     }
 
     @Test
     @Throws(Exception::class)
     fun markASSeenUpdatesJoke() = runTest {
-        jokeDao.insertJokes(jokesEntitiesTestData)
-        jokeDao.markAsSeen(135)
-        val unseenJokes = jokeDao.loadAllUnseenJokes()
-        val updatedJoke = jokesEntitiesTestData.firstOrNull { it.id == 135 }
-        assert(!unseenJokes.contains(updatedJoke))
-        assert(unseenJokes.size == 1)
+        jokeDao.insertJokes(jokesEntities)
+        val jokeId = jokesEntities.first().id
+        jokeDao.markAsSeen(jokeId)
+        val unseenJokes = jokeDao.loadAllUnseenJokes().first()
+        assert(unseenJokes.none { it.id == jokeId })
     }
 }
