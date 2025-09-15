@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">JokesForAll</string>
+    <string name="app_name">JokesMachine</string>
 
     <!-- General UI States -->
     <string name="loading_message">Loading jokes…</string>
@@ -15,7 +15,7 @@
 
     <!-- Intro -->
     <string-array name="intro_array">
-        <item>Welcome to the JokeMachine.</item>
+        <item>Welcome to the JokesMachine.</item>
         <item>First, let me tell you a little story.</item>
         <item>Once upon a time, there was a software developer with a dream:</item>
         <item>to create the next legendary video game.</item>
