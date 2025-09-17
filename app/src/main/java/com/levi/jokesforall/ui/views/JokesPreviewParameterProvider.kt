@@ -13,13 +13,15 @@ private object data {
         Joke(
             id = 135,
             type = JokeType.TWOPART,
+            singleText = null,
             setup = "Why do Hong Kong cops like to go to work early?",
             delivery = "To beat the crowd."
         ),
         Joke(
             id = 268,
             type = JokeType.SINGLE,
-            setup = "Hey girl are you a school? Because I want to shoot some kids up inside of you.",
+            singleText = "Hey girl are you a school? Because I want to shoot some kids up inside of you.",
+            setup = null,
             delivery = null
         )
     )

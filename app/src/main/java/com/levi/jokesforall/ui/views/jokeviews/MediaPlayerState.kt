@@ -42,19 +42,20 @@ class MediaPlayerState(
         pause()
     }
 
-    fun startOrResumePlayback() {
-        if (currentPlayerState == PlayerState.PAUSED) {
+    fun startOrResumePlayback(looping: Boolean = true) {
+        if (currentPlayerState == PlayerState.PAUSED || mediaPlayer?.isPlaying == false) {
+            mediaPlayer?.isLooping = looping
             mediaPlayer?.start()
             currentPlayerState = PlayerState.PLAYING
         } else if (currentPlayerState == PlayerState.UNPREPARED) {
-            prepareAndStart()
+            prepareAndStart(looping)
         }
     }
 
-    private fun prepareAndStart() {
+    private fun prepareAndStart(looping: Boolean) {
         mediaPlayer = MediaPlayer().apply {
             setOnPreparedListener {
-                isLooping = true
+                isLooping = looping
                 enabled = true
                 currentPlayerState = PlayerState.PLAYING
                 start()

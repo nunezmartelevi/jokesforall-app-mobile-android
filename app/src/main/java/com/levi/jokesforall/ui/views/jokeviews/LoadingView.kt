@@ -27,6 +27,7 @@ fun BoxWithConstraintsScope.LoadingView(
         modifier = modifier,
         maxWidth = maxWidth,
         maxHeight = maxHeight,
+        isSoundOn = isSoundOn,
         onSoundButtonPress = { onToggleSound(isSoundOn) }
     )
 

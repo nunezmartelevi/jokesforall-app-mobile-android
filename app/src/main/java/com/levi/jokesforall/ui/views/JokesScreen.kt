@@ -53,7 +53,7 @@ fun JokesScreen(viewModel: JokesViewModel = viewModel()) {
                     ErrorView(
                         isSoundOn = isSoundOn,
                         onToggleSound = viewModel::toggleSound,
-                        onRetry = viewModel::nextJoke
+                        onRetry = viewModel::refreshJokes
                     )
                 }
 

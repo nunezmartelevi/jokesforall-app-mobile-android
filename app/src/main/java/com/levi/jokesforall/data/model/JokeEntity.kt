@@ -10,7 +10,8 @@ data class JokeEntity(
     @PrimaryKey val id: Int,
     val category: String,
     val type: String,
-    val setup: String,
+    val joke: String?,
+    val setup: String?,
     val delivery: String?,
     val safe: Boolean,
     val lang: String,
@@ -24,6 +25,7 @@ fun List<JokeEntity>.asDomainModel(): List<Joke> =
             type = JokeType.fromValue(jokeEntity.type)
                 ?: if (jokeEntity.delivery != null) JokeType.TWOPART else JokeType.SINGLE,
             setup = jokeEntity.setup,
+            singleText = jokeEntity.joke,
             delivery = jokeEntity.delivery
         )
     }

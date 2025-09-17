@@ -6,24 +6,23 @@ import com.levi.jokesforall.data.model.asDomainModel
 import com.levi.jokesforall.data.remote.Dispatcher
 import com.levi.jokesforall.data.remote.JokesDispatchers.IO
 import com.levi.jokesforall.data.remote.JokesService
+import com.levi.jokesforall.data.remote.Result
 import com.levi.jokesforall.domain.model.Joke
 import com.levi.jokesforall.domain.repository.JokesRepository
-import com.levi.jokesforall.domain.repository.Syncable
+import com.levi.jokesforall.domain.repository.NoInternetException
+import com.levi.jokesforall.domain.repository.SyncingDataException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import com.levi.jokesforall.data.remote.Result
-import com.levi.jokesforall.domain.repository.NoInternetException
-import com.levi.jokesforall.domain.repository.SyncingDataException
 
 class OfflineFirstJokesRepository @Inject constructor(
     private val remoteDataSource: JokesService,
     private val localDataSource: JokeDao,
     @param:Dispatcher(IO) private val dispatcher: CoroutineDispatcher
-) : JokesRepository, Syncable {
+) : JokesRepository {
 
     override val observeAllUnseenJokes: Flow<List<Joke>> =
         localDataSource.loadAllUnseenJokes()
@@ -41,13 +40,15 @@ class OfflineFirstJokesRepository @Inject constructor(
                 } else {
                     Result.Error(SyncingDataException())
                 }
-            } catch (_: Exception) {
+            } catch (_: java.io.IOException) {
                 Result.Error(NoInternetException())
+            } catch (e: Exception) {
+                Result.Error(e)
             }
         }
     }
 
-    override suspend fun sync(): Boolean {
+    private suspend fun sync(): Boolean {
         val response = remoteDataSource.getJokes()
         return if (response.isSuccessful) {
             val jokes = response.body()?.jokes ?: emptyList()

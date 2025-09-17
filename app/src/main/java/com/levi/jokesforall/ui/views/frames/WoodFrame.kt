@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -22,6 +24,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Devices.PIXEL
 import androidx.compose.ui.tooling.preview.Devices.PIXEL_4
@@ -29,7 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.levi.jokesforall.R
-import com.levi.jokesforall.ui.theme.Wood
+import com.levi.jokesforall.ui.views.jokeviews.rememberMediaPlayerState
 import com.levi.jokesforall.util.PIXEL_1_VIEW_PORT
 import com.levi.jokesforall.util.PIXEL_4_VIEW_PORT
 import com.levi.jokesforall.util.isHighWidthViewPort
@@ -39,10 +42,27 @@ fun WoodFrame(
     modifier: Modifier = Modifier,
     maxWidth: Dp,
     maxHeight: Dp,
+    isSoundOn: Boolean,
     onAButtonPress: () -> Unit = {},
     onBButtonPress: () -> Unit = {},
     onSoundButtonPress: () -> Unit
 ) {
+    val context = LocalContext.current
+    val mediaPlayerState = rememberMediaPlayerState(context, R.raw.button_click_sound)
+
+    DisposableEffect(Unit) {
+        onDispose {
+            mediaPlayerState.clearMediaPlayer()
+        }
+    }
+    LaunchedEffect(isSoundOn) {
+        if (isSoundOn) {
+            mediaPlayerState.unMute()
+        } else {
+            mediaPlayerState.mute()
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -54,10 +74,9 @@ fun WoodFrame(
         val bButtonSize = (screenSize.value * 0.05f).dp
         val soundButtonSize = (screenSize.value * 0.05f).dp
 
-        // sets buttons offset based on screen max width and max height
+        // sets buttons offset based on screen max width and height
         val baseXOffset = if (isHighWidthViewPort(maxWidth, maxHeight)) 0.02 else 0.0
         val baseYOffset = if (isHighWidthViewPort(maxWidth, maxHeight)) 0.01 else 0.0
-
         val aButtonOffset = Pair(
             (-maxWidth.value * (0.06 + baseXOffset)).dp,
             (-maxHeight.value * (0.1 + baseYOffset)).dp
@@ -71,7 +90,7 @@ fun WoodFrame(
             (-maxHeight.value * (0.21 + baseYOffset)).dp
         )
 
-        // Wood frame
+        // Wood image
         Image(
             modifier = Modifier.matchParentSize(),
             painter = painterResource(id = R.drawable.ic_game_console_frame),
@@ -80,7 +99,7 @@ fun WoodFrame(
         )
 
         // A button
-        AnimatedImageButton(
+        AnimatedButton(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .offset(x = aButtonOffset.first, y = aButtonOffset.second)
@@ -92,11 +111,14 @@ fun WoodFrame(
                 ),
             size = aButtonSize,
             imageRes = R.drawable.ic_button_a,
-            onClick = onAButtonPress
+            onClick = {
+                onAButtonPress()
+                mediaPlayerState.startOrResumePlayback(false)
+            }
         )
 
         // B button
-        AnimatedImageButton(
+        AnimatedButton(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .offset(x = bButtonOffset.first, y = bButtonOffset.second)
@@ -109,24 +131,30 @@ fun WoodFrame(
                 ),
             size = bButtonSize,
             imageRes = R.drawable.ic_button_b,
-            onClick = onBButtonPress
+            onClick = {
+                onBButtonPress()
+                mediaPlayerState.startOrResumePlayback(false)
+            }
         )
 
         // Sound button
-        AnimatedImageButton(
+        AnimatedButton(
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .offset(x = soundButtonOffset.first, y = soundButtonOffset.second),
             size = soundButtonSize,
             imageRes = R.drawable.ic_button_music,
-            onClick = onSoundButtonPress
+            onClick = {
+                onSoundButtonPress()
+                mediaPlayerState.startOrResumePlayback(false)
+            }
         )
 
     }
 }
 
 @Composable
-private fun AnimatedImageButton(
+private fun AnimatedButton(
     modifier: Modifier = Modifier,
     size: Dp,
     @DrawableRes imageRes: Int,
@@ -136,7 +164,7 @@ private fun AnimatedImageButton(
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.9f else 1f,
+        targetValue = if (isPressed) 0.8f else 1f,
         label = "buttonScaleAnimation"
     )
 
@@ -160,11 +188,19 @@ private fun AnimatedImageButton(
 @Preview(device = PIXEL_4)
 @Composable
 fun WoodFramePreview() {
-    WoodFrame(maxWidth = PIXEL_4_VIEW_PORT.first, maxHeight = PIXEL_4_VIEW_PORT.second) {}
+    WoodFrame(
+        maxWidth = PIXEL_4_VIEW_PORT.first,
+        maxHeight = PIXEL_4_VIEW_PORT.second,
+        isSoundOn = true
+    ) {}
 }
 
 @Preview(device = PIXEL)
 @Composable
 fun WoodFramePreview2() {
-    WoodFrame(maxWidth = PIXEL_1_VIEW_PORT.first, maxHeight = PIXEL_1_VIEW_PORT.second) {}
+    WoodFrame(
+        maxWidth = PIXEL_1_VIEW_PORT.first,
+        maxHeight = PIXEL_1_VIEW_PORT.second,
+        isSoundOn = true
+    ) {}
 }

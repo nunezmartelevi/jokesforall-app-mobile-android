@@ -7,7 +7,7 @@
     <string name="error_message">An error occurred</string>
 
     <!-- User Actions -->
-    <string name="action_retry">Retry</string>
+    <string name="action_retry">Press A to retry</string>
     <string name="action_continue">Press A to continue</string>
     <string name="action_reveal_punchline">Press A to reveal the punchline</string>
     <string name="action_next_joke">Next: A</string>
