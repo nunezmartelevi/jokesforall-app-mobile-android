@@ -39,7 +39,7 @@ fun BoxWithConstraintsScope.JokeView(
     onHidePunchline: () -> Unit,
     onToggleSound: (Boolean) -> Unit
 ) {
-    val jokeText = if (shouldDisplayPunchline) joke.delivery else joke.setup
+    val jokeText = if (shouldDisplayPunchline) joke.delivery else joke.primaryText
     var isTextAnimationPlaying by remember { mutableStateOf(true) }
     val context = LocalContext.current
     val mediaPlayerState = rememberMediaPlayerState(context, R.raw.text_animation_sound)
@@ -75,6 +75,7 @@ fun BoxWithConstraintsScope.JokeView(
         modifier = modifier,
         maxWidth = maxWidth,
         maxHeight = maxHeight,
+        isSoundOn = isSoundOn,
         onAButtonPress = {
             if (!isTextAnimationPlaying) {
                 when (joke.type) {

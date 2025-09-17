@@ -75,6 +75,7 @@ fun BoxWithConstraintsScope.IntroView(
         modifier = modifier,
         maxWidth = maxWidth,
         maxHeight = maxHeight,
+        isSoundOn = isSoundOn,
         onAButtonPress = { if (introListState.finished) onContinuePress() },
         onSoundButtonPress = { onToggleSound(isSoundOn) }
     )

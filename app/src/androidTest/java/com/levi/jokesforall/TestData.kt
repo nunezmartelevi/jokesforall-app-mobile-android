@@ -7,6 +7,7 @@ val jokesEntities = listOf(
         id = 135,
         category = "Pun",
         type = "twopart",
+        joke = null,
         setup = "Why do Hong Kong cops like to go to work early?",
         delivery = "To beat the crowd.",
         safe = false,
@@ -17,20 +18,11 @@ val jokesEntities = listOf(
         id = 268,
         category = "Dark",
         type = "single",
-        setup = "Hey girl are you a school? Because I want to shoot some kids up inside of you.",
+        joke = "Hey girl are you a school? Because I want to shoot some kids up inside of you.",
+        setup = null,
         delivery = null,
         safe = false,
         lang = "en",
         seen = false
-    ),
-    JokeEntity(
-        id = 284,
-        category = "Pun",
-        type = "twopart",
-        setup = "Which part of the hospital has the least privacy?",
-        delivery = "The ICU.",
-        safe = true,
-        lang = "en",
-        seen = true
     )
 )

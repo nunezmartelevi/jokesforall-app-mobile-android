@@ -26,6 +26,7 @@ fun BoxWithConstraintsScope.ErrorView(
         modifier = modifier,
         maxWidth = maxWidth,
         maxHeight = maxHeight,
+        isSoundOn = isSoundOn,
         onAButtonPress = onRetry,
         onSoundButtonPress = { onToggleSound(isSoundOn) }
     )

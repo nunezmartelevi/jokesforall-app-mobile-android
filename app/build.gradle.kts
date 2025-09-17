@@ -41,11 +41,11 @@ android {
     productFlavors {
         create("dev") {
             dimension = "enviroment"
-            buildConfigField("String", "BASE_URL", "\"https://v2.jokeapi.dev/joke/Any?amount=10\"")
+            buildConfigField("String", "BASE_URL", "\"https://v2.jokeapi.dev/\"")
         }
         create("prod") {
             dimension = "enviroment"
-            buildConfigField("String", "BASE_URL", "\"https://v2.jokeapi.dev/joke/Any?amount=10\"")
+            buildConfigField("String", "BASE_URL", "\"https://v2.jokeapi.dev/\"")
         }
     }
 

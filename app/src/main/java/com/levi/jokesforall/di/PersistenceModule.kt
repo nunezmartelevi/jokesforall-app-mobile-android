@@ -3,7 +3,6 @@ package com.levi.jokesforall.di
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
-import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
@@ -21,7 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import javax.inject.Singleton
 
-private const val SETTINGS_PREFERENCES_NAME = "app_settings"
+private const val APP_PREFERENCES_NAME = "app_preferences"
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -35,7 +34,7 @@ object PersistenceModule {
                 produceNewData = { emptyPreferences() }
             ),
             scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-            produceFile = { appContext.preferencesDataStoreFile(SETTINGS_PREFERENCES_NAME) }
+            produceFile = { appContext.preferencesDataStoreFile(APP_PREFERENCES_NAME) }
         )
     }
 
