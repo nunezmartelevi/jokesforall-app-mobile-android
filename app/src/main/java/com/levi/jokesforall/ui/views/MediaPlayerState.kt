@@ -134,7 +134,6 @@ class MediaPlayerState(
                 setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
                 afd.close()
                 prepareAsync()
-
             } catch (e: Exception) {
                 Log.e(
                     TAG,
