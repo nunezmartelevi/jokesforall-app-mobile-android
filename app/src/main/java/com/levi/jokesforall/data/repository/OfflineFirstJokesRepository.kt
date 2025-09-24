@@ -12,6 +12,7 @@ import com.levi.jokesforall.domain.repository.JokesRepository
 import com.levi.jokesforall.domain.repository.NoInternetException
 import com.levi.jokesforall.domain.repository.SyncingDataException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -23,13 +24,14 @@ class OfflineFirstJokesRepository @Inject constructor(
     private val localDataSource: JokeDao,
     @param:Dispatcher(IO) private val dispatcher: CoroutineDispatcher
 ) : JokesRepository {
+    private val syncDelayInMillis = 1500L
 
     override val observeAllUnseenJokes: Flow<List<Joke>> =
         localDataSource.loadAllUnseenJokes()
             .map { cachedJokes ->
                 cachedJokes.asDomainModel()
             }
-            .flowOn(dispatcher)
+
 
     override suspend fun refreshJokes(): Result<Unit> {
         return withContext(dispatcher) {
@@ -51,6 +53,8 @@ class OfflineFirstJokesRepository @Inject constructor(
     private suspend fun sync(): Boolean {
         val response = remoteDataSource.getJokes()
         return if (response.isSuccessful) {
+            // Delay to allow the loading animation to show
+            delay(syncDelayInMillis)
             val jokes = response.body()?.jokes ?: emptyList()
             localDataSource.deleteAll()
             val rowIds = localDataSource.insertJokes(jokes.asDatabaseModel())

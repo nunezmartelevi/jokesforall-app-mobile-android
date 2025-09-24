@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">JokesMachine</string>
+    <string name="app_name">Jokes Machine</string>
 
     <!-- General UI States -->
     <string name="loading_message">Loading jokes…</string>
@@ -9,6 +9,7 @@
     <!-- User Actions -->
     <string name="action_retry">Press A to retry</string>
     <string name="action_continue">Press A to continue</string>
+    <string name="action_skip">Press B to skip intro</string>
     <string name="action_reveal_punchline">Press A to reveal the punchline</string>
     <string name="action_next_joke">Next: A</string>
     <string name="action_back_to_setup">Back: B</string>

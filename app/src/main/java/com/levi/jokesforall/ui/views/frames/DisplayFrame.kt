@@ -48,15 +48,17 @@ import java.text.StringCharacterIterator
 @Composable
 fun DisplayFrame(
     modifier: Modifier = Modifier,
-    maxHeight: Dp,
+    maxScreenHeight: Dp,
     isSoundOn: Boolean,
     mainText: String,
     textAnimationSpeed: TextAnimationSpeed = TextAnimationSpeed.Fast,
     onTextAnimationEnd: () -> Unit = {},
+    onTextAnimationStart: () -> Unit = {},
+    isFooterAlwaysVisible: Boolean = false,
     footerContent: @Composable (RowScope.(TextStyle) -> Unit) = {}
 ) {
-    val calculatedFrameHeight = (maxHeight.value * 0.57).dp
-    var shouldDisplayFooterContent by remember { mutableStateOf(false) }
+    val calculatedFrameHeight = (maxScreenHeight.value * 0.57).dp
+    var shouldDisplayFooter by remember { mutableStateOf(isFooterAlwaysVisible) }
 
     ConstraintLayout(
         modifier = modifier
@@ -80,10 +82,13 @@ fun DisplayFrame(
             },
             text = mainText,
             textAnimationSpeed = textAnimationSpeed,
-            onAnimationStart = { shouldDisplayFooterContent = false },
+            onAnimationStart = {
+                onTextAnimationStart()
+                shouldDisplayFooter = isFooterAlwaysVisible
+            },
             onAnimationEnd = {
-                shouldDisplayFooterContent = true
                 onTextAnimationEnd()
+                shouldDisplayFooter = true
             }
         )
 
@@ -92,7 +97,7 @@ fun DisplayFrame(
                 .constrainAs(footer) {
                     bottom.linkTo(parent.bottom)
                 },
-            isVisible = shouldDisplayFooterContent
+            isVisible = shouldDisplayFooter
         ) {
             val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
             val animatedColor by infiniteTransition.animateColor(
@@ -141,8 +146,8 @@ private fun CenterText(
     onAnimationEnd: () -> Unit
 ) {
     val breakIterator = remember(text) { BreakIterator.getCharacterInstance() }
-    val typingDelayInMs = textAnimationSpeed.value
     var substringText by remember { mutableStateOf("") }
+    val typingDelayInMs = textAnimationSpeed.value
 
     LaunchedEffect(text) {
         onAnimationStart()
@@ -153,7 +158,6 @@ private fun CenterText(
             nextIndex = breakIterator.next()
             delay(typingDelayInMs)
         }
-        delay(100)
         onAnimationEnd()
     }
 
@@ -175,7 +179,12 @@ private fun Footer(
     Box(modifier = modifier.height(30.dp)) {
         AnimatedVisibility(
             visible = isVisible,
-            enter = fadeIn(animationSpec = tween(500)),
+            enter = fadeIn(
+                animationSpec = tween(
+                    durationMillis = 500,
+                    delayMillis = 100
+                )
+            ),
             exit = ExitTransition.None
         ) {
             Row(
@@ -193,7 +202,7 @@ private fun Footer(
 private fun TextFramePreview() {
     JokesForAllTheme {
         DisplayFrame(
-            maxHeight = PIXEL_4_VIEW_PORT.second,
+            maxScreenHeight = PIXEL_4_VIEW_PORT.second,
             isSoundOn = false,
             mainText = "This is a joke",
             footerContent = {

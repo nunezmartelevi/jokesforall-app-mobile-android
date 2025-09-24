@@ -24,8 +24,10 @@ import com.levi.jokesforall.domain.model.Joke
 import com.levi.jokesforall.domain.model.JokeType
 import com.levi.jokesforall.ui.theme.JokesForAllTheme
 import com.levi.jokesforall.ui.views.JokesPreviewParameterProvider
+import com.levi.jokesforall.ui.views.MediaPlayerVolumeEffect
 import com.levi.jokesforall.ui.views.frames.WoodFrame
 import com.levi.jokesforall.ui.views.frames.DisplayFrame
+import com.levi.jokesforall.ui.views.rememberMediaPlayerState
 import com.levi.jokesforall.util.calculateTextFramePadding
 
 @Composable
@@ -39,14 +41,16 @@ fun BoxWithConstraintsScope.JokeView(
     onHidePunchline: () -> Unit,
     onToggleSound: (Boolean) -> Unit
 ) {
-    val jokeText = if (shouldDisplayPunchline) joke.delivery else joke.primaryText
-    var isTextAnimationPlaying by remember { mutableStateOf(true) }
+    val jokeText = if (shouldDisplayPunchline) joke.delivery else joke.startingText
+    var isTextAnimationPlaying by remember { mutableStateOf(false) }
+    var shouldDisplayOptions by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val mediaPlayerState = rememberMediaPlayerState(context, R.raw.text_animation_sound)
     val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(Unit) {
         lifecycleOwner.lifecycle.addObserver(mediaPlayerState)
+        mediaPlayerState.prepare()
         onDispose {
             mediaPlayerState.clearMediaPlayer()
             lifecycleOwner.lifecycle.removeObserver(mediaPlayerState)
@@ -55,40 +59,45 @@ fun BoxWithConstraintsScope.JokeView(
 
     LaunchedEffect(isTextAnimationPlaying) {
         if (isTextAnimationPlaying) {
-            mediaPlayerState.startOrResumePlayback()
-            mediaPlayerState.setEnabled(true)
+            mediaPlayerState.apply {
+                resetPlaybackPosition()
+                startOrResumePlayback()
+                setResumingOnStartEnabled(true)
+            }
         } else {
-            mediaPlayerState.pauseAndReset()
-            mediaPlayerState.setEnabled(false)
+            mediaPlayerState.apply {
+                pausePlayback()
+                setResumingOnStartEnabled(false)
+            }
         }
     }
 
-    LaunchedEffect(isSoundOn) {
-        if (isSoundOn) {
-            mediaPlayerState.unMute()
-        } else {
-            mediaPlayerState.mute()
-        }
-    }
+    MediaPlayerVolumeEffect(isSoundOn, mediaPlayerState)
 
     WoodFrame(
         modifier = modifier,
-        maxWidth = maxWidth,
-        maxHeight = maxHeight,
+        maxScreenWidth = maxWidth,
+        maxScreenHeight = maxHeight,
         isSoundOn = isSoundOn,
         onAButtonPress = {
             if (!isTextAnimationPlaying) {
+                shouldDisplayOptions = false
                 when (joke.type) {
                     JokeType.SINGLE -> onNextJoke()
-                    JokeType.TWOPART -> if (shouldDisplayPunchline) onNextJoke() else onDisplayPunchline()
+                    JokeType.TWOPART -> {
+                        if (shouldDisplayPunchline) {
+                            onNextJoke()
+                        } else {
+                            onDisplayPunchline()
+                        }
+                    }
                 }
-                isTextAnimationPlaying = true
             }
         },
         onBButtonPress = {
             if (!isTextAnimationPlaying && shouldDisplayPunchline) {
+                shouldDisplayOptions = false
                 onHidePunchline()
-                isTextAnimationPlaying = true
             }
         },
         onSoundButtonPress = { onToggleSound(isSoundOn) }
@@ -96,12 +105,16 @@ fun BoxWithConstraintsScope.JokeView(
 
     DisplayFrame(
         modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
-        maxHeight = maxHeight,
+        maxScreenHeight = maxHeight,
         isSoundOn = isSoundOn,
         mainText = jokeText ?: "",
-        onTextAnimationEnd = { isTextAnimationPlaying = false }
+        onTextAnimationStart = { isTextAnimationPlaying = true },
+        onTextAnimationEnd = {
+            isTextAnimationPlaying = false
+            shouldDisplayOptions = true
+        }
     ) { textStyle ->
-        if (!isTextAnimationPlaying)
+        if (shouldDisplayOptions) {
             when (joke.type) {
                 JokeType.SINGLE -> {
                     Spacer(modifier = Modifier.weight(1f))
@@ -137,6 +150,7 @@ fun BoxWithConstraintsScope.JokeView(
                 }
 
             }
+        }
     }
 }
 

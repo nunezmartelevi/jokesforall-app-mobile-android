@@ -7,7 +7,7 @@ data class Joke(
     private val setup: String?,
     val delivery: String?
 ) {
-    val primaryText: String?
+    val startingText: String?
         get() = when (type) {
             JokeType.SINGLE -> singleText
             JokeType.TWOPART -> setup

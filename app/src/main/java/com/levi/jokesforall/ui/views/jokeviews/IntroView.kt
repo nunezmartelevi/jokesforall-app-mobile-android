@@ -2,6 +2,10 @@ package com.levi.jokesforall.ui.views.jokeviews
 
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,9 +27,11 @@ import androidx.compose.ui.tooling.preview.Devices.PIXEL_4
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.levi.jokesforall.R
+import com.levi.jokesforall.ui.views.MediaPlayerVolumeEffect
 import com.levi.jokesforall.ui.views.frames.WoodFrame
 import com.levi.jokesforall.ui.views.frames.DisplayFrame
 import com.levi.jokesforall.ui.views.frames.TextAnimationSpeed
+import com.levi.jokesforall.ui.views.rememberMediaPlayerState
 import com.levi.jokesforall.util.calculateTextFramePadding
 import kotlinx.coroutines.delay
 
@@ -37,8 +43,8 @@ fun BoxWithConstraintsScope.IntroView(
     onContinuePress: () -> Unit
 ) {
     val introTexts: Array<String> = stringArrayResource(R.array.intro_array)
-    var isTextAnimationPlaying by remember { mutableStateOf(true) }
     val introListState = rememberIntroListState(introTexts.toList())
+    var isTextAnimationPlaying by remember { mutableStateOf(true) }
     val context = LocalContext.current
     val mediaPlayerState = rememberMediaPlayerState(context, R.raw.intro_music)
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -47,7 +53,11 @@ fun BoxWithConstraintsScope.IntroView(
         val window = (context as? ComponentActivity)?.window
         window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         lifecycleOwner.lifecycle.addObserver(mediaPlayerState)
-        mediaPlayerState.startOrResumePlayback()
+        mediaPlayerState.apply {
+            setLoopingEnabled(true)
+            prepare(shouldStartPlaybackAfterPrepared = true)
+            setResumingOnStartEnabled(true)
+        }
 
         onDispose {
             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -63,30 +73,26 @@ fun BoxWithConstraintsScope.IntroView(
         }
     }
 
-    LaunchedEffect(isSoundOn) {
-        if (isSoundOn) {
-            mediaPlayerState.unMute()
-        } else {
-            mediaPlayerState.mute()
-        }
-    }
+    MediaPlayerVolumeEffect(isSoundOn, mediaPlayerState)
 
     WoodFrame(
         modifier = modifier,
-        maxWidth = maxWidth,
-        maxHeight = maxHeight,
+        maxScreenWidth = maxWidth,
+        maxScreenHeight = maxHeight,
         isSoundOn = isSoundOn,
         onAButtonPress = { if (introListState.finished) onContinuePress() },
+        onBButtonPress = { if (introListState.canSkip) onContinuePress() },
         onSoundButtonPress = { onToggleSound(isSoundOn) }
     )
 
     DisplayFrame(
         modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
-        maxHeight = maxHeight,
+        maxScreenHeight = maxHeight,
         isSoundOn = isSoundOn,
         mainText = introListState.text,
         textAnimationSpeed = TextAnimationSpeed.Slow,
-        onTextAnimationEnd = { isTextAnimationPlaying = false }
+        onTextAnimationEnd = { isTextAnimationPlaying = false },
+        isFooterAlwaysVisible = introListState.canSkip
     ) { textStyle ->
         if (introListState.finished) {
             Text(
@@ -94,6 +100,14 @@ fun BoxWithConstraintsScope.IntroView(
                 text = stringResource(R.string.action_continue),
                 textAlign = TextAlign.Center,
                 style = textStyle
+            )
+        } else if (introListState.canSkip) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.action_skip),
+                textAlign = TextAlign.Center,
+                style = textStyle,
+                color = textStyle.color.copy(alpha = 0.7f)
             )
         }
     }
@@ -119,17 +133,24 @@ class IntroListState(private val textList: List<String>) {
     private var currentTextIndex = 0
     var text = textList.firstOrNull() ?: ""
         private set
+
+    var canSkip by mutableStateOf(false)
     var finished = false
         private set
-    private val delayTimeInMillis = 1000L
 
     suspend fun nextText() {
         currentTextIndex++
         if (currentTextIndex >= textList.size) {
+            delay(100)
             finished = true
         } else {
-            delay(delayTimeInMillis)
+            delay(1000)
             text = textList[currentTextIndex]
+            setCanSkip()
         }
+    }
+
+    private fun setCanSkip() {
+        canSkip = currentTextIndex >= (textList.size / 2) - 1
     }
 }

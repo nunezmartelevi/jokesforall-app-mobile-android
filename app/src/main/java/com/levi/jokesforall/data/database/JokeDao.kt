@@ -19,5 +19,5 @@ interface JokeDao {
     fun loadAllUnseenJokes(): Flow<List<JokeEntity>>
 
     @Query("UPDATE jokes SET seen = 1 WHERE id = :id")
-    fun markAsSeen(id: Int)
+    suspend fun markAsSeen(id: Int)
 }

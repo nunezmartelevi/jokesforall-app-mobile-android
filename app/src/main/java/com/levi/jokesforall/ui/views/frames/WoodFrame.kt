@@ -15,7 +15,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -31,8 +30,10 @@ import androidx.compose.ui.tooling.preview.Devices.PIXEL_4
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.levi.jokesforall.R
-import com.levi.jokesforall.ui.views.jokeviews.rememberMediaPlayerState
+import com.levi.jokesforall.ui.views.MediaPlayerVolumeEffect
+import com.levi.jokesforall.ui.views.rememberMediaPlayerState
 import com.levi.jokesforall.util.PIXEL_1_VIEW_PORT
 import com.levi.jokesforall.util.PIXEL_4_VIEW_PORT
 import com.levi.jokesforall.util.isHighWidthViewPort
@@ -40,8 +41,8 @@ import com.levi.jokesforall.util.isHighWidthViewPort
 @Composable
 fun WoodFrame(
     modifier: Modifier = Modifier,
-    maxWidth: Dp,
-    maxHeight: Dp,
+    maxScreenWidth: Dp,
+    maxScreenHeight: Dp,
     isSoundOn: Boolean,
     onAButtonPress: () -> Unit = {},
     onBButtonPress: () -> Unit = {},
@@ -49,19 +50,18 @@ fun WoodFrame(
 ) {
     val context = LocalContext.current
     val mediaPlayerState = rememberMediaPlayerState(context, R.raw.button_click_sound)
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(Unit) {
+        lifecycleOwner.lifecycle.addObserver(mediaPlayerState)
+        mediaPlayerState.prepare()
         onDispose {
             mediaPlayerState.clearMediaPlayer()
+            lifecycleOwner.lifecycle.removeObserver(mediaPlayerState)
         }
     }
-    LaunchedEffect(isSoundOn) {
-        if (isSoundOn) {
-            mediaPlayerState.unMute()
-        } else {
-            mediaPlayerState.mute()
-        }
-    }
+
+    MediaPlayerVolumeEffect(isSoundOn, mediaPlayerState)
 
     Box(
         modifier = modifier
@@ -69,25 +69,25 @@ fun WoodFrame(
             .background(MaterialTheme.colorScheme.background)
     ) {
         // sets buttons size based on screen size
-        val screenSize = maxWidth + maxHeight
+        val screenSize = maxScreenWidth + maxScreenHeight
         val aButtonSize = (screenSize.value * 0.07f).dp
         val bButtonSize = (screenSize.value * 0.05f).dp
         val soundButtonSize = (screenSize.value * 0.05f).dp
 
         // sets buttons offset based on screen max width and height
-        val baseXOffset = if (isHighWidthViewPort(maxWidth, maxHeight)) 0.02 else 0.0
-        val baseYOffset = if (isHighWidthViewPort(maxWidth, maxHeight)) 0.01 else 0.0
+        val baseXOffset = if (isHighWidthViewPort(maxScreenWidth, maxScreenHeight)) 0.02 else 0.0
+        val baseYOffset = if (isHighWidthViewPort(maxScreenWidth, maxScreenHeight)) 0.01 else 0.0
         val aButtonOffset = Pair(
-            (-maxWidth.value * (0.06 + baseXOffset)).dp,
-            (-maxHeight.value * (0.1 + baseYOffset)).dp
+            (-maxScreenWidth.value * (0.06 + baseXOffset)).dp,
+            (-maxScreenHeight.value * (0.1 + baseYOffset)).dp
         )
         val bButtonOffset = Pair(
-            (-maxWidth.value * (0.3 + baseXOffset)).dp,
-            (-maxHeight.value * (0.18 + baseYOffset)).dp
+            (-maxScreenWidth.value * (0.3 + baseXOffset)).dp,
+            (-maxScreenHeight.value * (0.18 + baseYOffset)).dp
         )
         val soundButtonOffset = Pair(
-            (maxWidth.value * (0.06 + baseXOffset)).dp,
-            (-maxHeight.value * (0.21 + baseYOffset)).dp
+            (maxScreenWidth.value * (0.06 + baseXOffset)).dp,
+            (-maxScreenHeight.value * (0.21 + baseYOffset)).dp
         )
 
         // Wood image
@@ -113,7 +113,7 @@ fun WoodFrame(
             imageRes = R.drawable.ic_button_a,
             onClick = {
                 onAButtonPress()
-                mediaPlayerState.startOrResumePlayback(false)
+                mediaPlayerState.startOrResumePlayback()
             }
         )
 
@@ -133,7 +133,7 @@ fun WoodFrame(
             imageRes = R.drawable.ic_button_b,
             onClick = {
                 onBButtonPress()
-                mediaPlayerState.startOrResumePlayback(false)
+                mediaPlayerState.startOrResumePlayback()
             }
         )
 
@@ -146,7 +146,7 @@ fun WoodFrame(
             imageRes = R.drawable.ic_button_music,
             onClick = {
                 onSoundButtonPress()
-                mediaPlayerState.startOrResumePlayback(false)
+                mediaPlayerState.startOrResumePlayback()
             }
         )
 
@@ -189,8 +189,8 @@ private fun AnimatedButton(
 @Composable
 fun WoodFramePreview() {
     WoodFrame(
-        maxWidth = PIXEL_4_VIEW_PORT.first,
-        maxHeight = PIXEL_4_VIEW_PORT.second,
+        maxScreenWidth = PIXEL_4_VIEW_PORT.first,
+        maxScreenHeight = PIXEL_4_VIEW_PORT.second,
         isSoundOn = true
     ) {}
 }
@@ -199,8 +199,8 @@ fun WoodFramePreview() {
 @Composable
 fun WoodFramePreview2() {
     WoodFrame(
-        maxWidth = PIXEL_1_VIEW_PORT.first,
-        maxHeight = PIXEL_1_VIEW_PORT.second,
+        maxScreenWidth = PIXEL_1_VIEW_PORT.first,
+        maxScreenHeight = PIXEL_1_VIEW_PORT.second,
         isSoundOn = true
     ) {}
 }
