@@ -39,9 +39,11 @@ fun BoxWithConstraintsScope.LoadingView(
 
     DisposableEffect(Unit) {
         lifecycleOwner.lifecycle.addObserver(mediaPlayerState)
-        mediaPlayerState.setLoopingEnabled(true)
-        mediaPlayerState.prepare(shouldStartPlaybackAfterPrepared = true)
-        mediaPlayerState.setResumingOnStartEnabled(true)
+        mediaPlayerState.apply {
+            setLoopingEnabled(true)
+            prepare(shouldStartPlaybackAfterPrepared = true)
+            setResumingOnStartEnabled(true)
+        }
 
         onDispose {
             mediaPlayerState.clearMediaPlayer()
