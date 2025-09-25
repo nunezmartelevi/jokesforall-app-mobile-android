@@ -2,10 +2,6 @@ package com.levi.jokesforall.ui.views.jokeviews
 
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,9 +24,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.levi.jokesforall.R
 import com.levi.jokesforall.ui.views.MediaPlayerVolumeEffect
-import com.levi.jokesforall.ui.views.frames.WoodFrame
-import com.levi.jokesforall.ui.views.frames.DisplayFrame
-import com.levi.jokesforall.ui.views.frames.TextAnimationSpeed
+import com.levi.jokesforall.ui.views.console.Display
+import com.levi.jokesforall.ui.views.console.TextAnimationSpeed
+import com.levi.jokesforall.ui.views.console.Controls
 import com.levi.jokesforall.ui.views.rememberMediaPlayerState
 import com.levi.jokesforall.util.calculateTextFramePadding
 import kotlinx.coroutines.delay
@@ -75,7 +71,7 @@ fun BoxWithConstraintsScope.IntroView(
 
     MediaPlayerVolumeEffect(isSoundOn, mediaPlayerState)
 
-    WoodFrame(
+    Controls(
         modifier = modifier,
         maxScreenWidth = maxWidth,
         maxScreenHeight = maxHeight,
@@ -85,29 +81,28 @@ fun BoxWithConstraintsScope.IntroView(
         onSoundButtonPress = { onToggleSound(isSoundOn) }
     )
 
-    DisplayFrame(
+    Display(
         modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
         maxScreenHeight = maxHeight,
         isSoundOn = isSoundOn,
         mainText = introListState.text,
         textAnimationSpeed = TextAnimationSpeed.Slow,
         onTextAnimationEnd = { isTextAnimationPlaying = false },
-        isFooterAlwaysVisible = introListState.canSkip
+        shouldDisplayFooter = introListState.canSkip || introListState.finished
     ) { textStyle ->
-        if (introListState.finished) {
+        if (introListState.canSkip) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.action_skip),
+                textAlign = TextAlign.Start,
+                style = textStyle
+            )
+        } else if (introListState.finished) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(R.string.action_continue),
                 textAlign = TextAlign.Center,
                 style = textStyle
-            )
-        } else if (introListState.canSkip) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(R.string.action_skip),
-                textAlign = TextAlign.Center,
-                style = textStyle,
-                color = textStyle.color.copy(alpha = 0.7f)
             )
         }
     }
@@ -135,22 +130,20 @@ class IntroListState(private val textList: List<String>) {
         private set
 
     var canSkip by mutableStateOf(false)
+        private set
     var finished = false
         private set
 
     suspend fun nextText() {
         currentTextIndex++
         if (currentTextIndex >= textList.size) {
+            canSkip = false
             delay(100)
             finished = true
         } else {
             delay(1000)
             text = textList[currentTextIndex]
-            setCanSkip()
+            canSkip = currentTextIndex >= (textList.size / 2) - 1
         }
-    }
-
-    private fun setCanSkip() {
-        canSkip = currentTextIndex >= (textList.size / 2) - 1
     }
 }

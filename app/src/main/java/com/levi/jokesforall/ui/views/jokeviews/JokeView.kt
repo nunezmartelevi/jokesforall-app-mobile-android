@@ -25,8 +25,8 @@ import com.levi.jokesforall.domain.model.JokeType
 import com.levi.jokesforall.ui.theme.JokesForAllTheme
 import com.levi.jokesforall.ui.views.JokesPreviewParameterProvider
 import com.levi.jokesforall.ui.views.MediaPlayerVolumeEffect
-import com.levi.jokesforall.ui.views.frames.WoodFrame
-import com.levi.jokesforall.ui.views.frames.DisplayFrame
+import com.levi.jokesforall.ui.views.console.Controls
+import com.levi.jokesforall.ui.views.console.Display
 import com.levi.jokesforall.ui.views.rememberMediaPlayerState
 import com.levi.jokesforall.util.calculateTextFramePadding
 
@@ -74,14 +74,13 @@ fun BoxWithConstraintsScope.JokeView(
 
     MediaPlayerVolumeEffect(isSoundOn, mediaPlayerState)
 
-    WoodFrame(
+    Controls(
         modifier = modifier,
         maxScreenWidth = maxWidth,
         maxScreenHeight = maxHeight,
         isSoundOn = isSoundOn,
         onAButtonPress = {
-            if (!isTextAnimationPlaying) {
-                shouldDisplayOptions = false
+            if (shouldDisplayOptions) {
                 when (joke.type) {
                     JokeType.SINGLE -> onNextJoke()
                     JokeType.TWOPART -> {
@@ -92,18 +91,19 @@ fun BoxWithConstraintsScope.JokeView(
                         }
                     }
                 }
+                shouldDisplayOptions = false
             }
         },
         onBButtonPress = {
-            if (!isTextAnimationPlaying && shouldDisplayPunchline) {
-                shouldDisplayOptions = false
+            if (shouldDisplayOptions && shouldDisplayPunchline) {
                 onHidePunchline()
+                shouldDisplayOptions = false
             }
         },
         onSoundButtonPress = { onToggleSound(isSoundOn) }
     )
 
-    DisplayFrame(
+    Display(
         modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
         maxScreenHeight = maxHeight,
         isSoundOn = isSoundOn,
@@ -112,12 +112,12 @@ fun BoxWithConstraintsScope.JokeView(
         onTextAnimationEnd = {
             isTextAnimationPlaying = false
             shouldDisplayOptions = true
-        }
+        },
+        shouldDisplayFooter = shouldDisplayOptions
     ) { textStyle ->
-        if (shouldDisplayOptions) {
+        if (shouldDisplayOptions)
             when (joke.type) {
                 JokeType.SINGLE -> {
-                    Spacer(modifier = Modifier.weight(1f))
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         text = stringResource(R.string.action_next_joke),
@@ -130,13 +130,11 @@ fun BoxWithConstraintsScope.JokeView(
                     if (shouldDisplayPunchline) {
                         Text(
                             text = stringResource(R.string.action_back_to_setup),
-                            textAlign = TextAlign.Center,
                             style = textStyle
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
                             text = stringResource(R.string.action_next_joke),
-                            textAlign = TextAlign.Center,
                             style = textStyle
                         )
                     } else {
@@ -148,9 +146,7 @@ fun BoxWithConstraintsScope.JokeView(
                         )
                     }
                 }
-
             }
-        }
     }
 }
 

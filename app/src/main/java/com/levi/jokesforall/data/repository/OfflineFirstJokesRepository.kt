@@ -30,7 +30,7 @@ class OfflineFirstJokesRepository @Inject constructor(
         localDataSource.loadAllUnseenJokes()
             .map { cachedJokes ->
                 cachedJokes.asDomainModel()
-            }
+            }.flowOn(dispatcher)
 
 
     override suspend fun refreshJokes(): Result<Unit> {
@@ -38,6 +38,7 @@ class OfflineFirstJokesRepository @Inject constructor(
             try {
                 val wasSyncSuccessful = sync()
                 if (wasSyncSuccessful) {
+                    println("calling refresh from repository")
                     Result.Success(Unit)
                 } else {
                     Result.Error(SyncingDataException())

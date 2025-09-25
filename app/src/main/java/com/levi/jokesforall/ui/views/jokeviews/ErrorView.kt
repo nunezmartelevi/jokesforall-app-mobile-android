@@ -11,8 +11,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.levi.jokesforall.R
 import com.levi.jokesforall.ui.theme.JokesForAllTheme
-import com.levi.jokesforall.ui.views.frames.WoodFrame
-import com.levi.jokesforall.ui.views.frames.DisplayFrame
+import com.levi.jokesforall.ui.views.console.Controls
+import com.levi.jokesforall.ui.views.console.Display
 import com.levi.jokesforall.util.calculateTextFramePadding
 
 @Composable
@@ -22,7 +22,7 @@ fun BoxWithConstraintsScope.ErrorView(
     onToggleSound: (Boolean) -> Unit,
     onRetry: () -> Unit
 ) {
-    WoodFrame(
+    Controls(
         modifier = modifier,
         maxScreenWidth = maxWidth,
         maxScreenHeight = maxHeight,
@@ -31,7 +31,7 @@ fun BoxWithConstraintsScope.ErrorView(
         onSoundButtonPress = { onToggleSound(isSoundOn) }
     )
 
-    DisplayFrame(
+    Display(
         modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
         maxScreenHeight = maxHeight,
         isSoundOn = isSoundOn,

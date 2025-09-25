@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -16,9 +20,9 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.levi.jokesforall.R
 import com.levi.jokesforall.ui.theme.JokesForAllTheme
 import com.levi.jokesforall.ui.views.MediaPlayerVolumeEffect
-import com.levi.jokesforall.ui.views.frames.WoodFrame
-import com.levi.jokesforall.ui.views.frames.DisplayFrame
-import com.levi.jokesforall.ui.views.frames.TextAnimationSpeed
+import com.levi.jokesforall.ui.views.console.Controls
+import com.levi.jokesforall.ui.views.console.Display
+import com.levi.jokesforall.ui.views.console.TextAnimationSpeed
 import com.levi.jokesforall.ui.views.rememberMediaPlayerState
 import com.levi.jokesforall.util.calculateTextFramePadding
 
@@ -31,6 +35,7 @@ fun BoxWithConstraintsScope.LoadingView(
     val context = LocalContext.current
     val mediaPlayerState = rememberMediaPlayerState(context, R.raw.loading_sound)
     val lifecycleOwner = LocalLifecycleOwner.current
+    var shouldDisplayFooter by remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
         lifecycleOwner.lifecycle.addObserver(mediaPlayerState)
@@ -45,7 +50,7 @@ fun BoxWithConstraintsScope.LoadingView(
 
     MediaPlayerVolumeEffect(isSoundOn, mediaPlayerState)
 
-    WoodFrame(
+    Controls(
         modifier = modifier,
         maxScreenWidth = maxWidth,
         maxScreenHeight = maxHeight,
@@ -53,12 +58,14 @@ fun BoxWithConstraintsScope.LoadingView(
         onSoundButtonPress = { onToggleSound(isSoundOn) }
     )
 
-    DisplayFrame(
+    Display(
         modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
         maxScreenHeight = maxHeight,
         isSoundOn = isSoundOn,
         mainText = stringResource(R.string.loading_message),
-        textAnimationSpeed = TextAnimationSpeed.Normal
+        textAnimationSpeed = TextAnimationSpeed.Normal,
+        onTextAnimationEnd = { shouldDisplayFooter = true },
+        shouldDisplayFooter = shouldDisplayFooter
     ) { textStyle ->
         Text(
             modifier = Modifier.fillMaxWidth(),

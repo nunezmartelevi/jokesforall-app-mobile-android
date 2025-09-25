@@ -1,4 +1,4 @@
-package com.levi.jokesforall.ui.views.frames
+package com.levi.jokesforall.ui.views.console
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.animateFloatAsState
@@ -39,7 +39,7 @@ import com.levi.jokesforall.util.PIXEL_4_VIEW_PORT
 import com.levi.jokesforall.util.isHighWidthViewPort
 
 @Composable
-fun WoodFrame(
+fun Controls(
     modifier: Modifier = Modifier,
     maxScreenWidth: Dp,
     maxScreenHeight: Dp,
@@ -187,8 +187,8 @@ private fun AnimatedButton(
 
 @Preview(device = PIXEL_4)
 @Composable
-fun WoodFramePreview() {
-    WoodFrame(
+fun ControlsPreview() {
+    Controls(
         maxScreenWidth = PIXEL_4_VIEW_PORT.first,
         maxScreenHeight = PIXEL_4_VIEW_PORT.second,
         isSoundOn = true
@@ -197,8 +197,8 @@ fun WoodFramePreview() {
 
 @Preview(device = PIXEL)
 @Composable
-fun WoodFramePreview2() {
-    WoodFrame(
+fun ControlsPreview2() {
+    Controls(
         maxScreenWidth = PIXEL_1_VIEW_PORT.first,
         maxScreenHeight = PIXEL_1_VIEW_PORT.second,
         isSoundOn = true

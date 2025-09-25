@@ -1,4 +1,4 @@
-package com.levi.jokesforall.ui.views.frames
+package com.levi.jokesforall.ui.views.console
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable

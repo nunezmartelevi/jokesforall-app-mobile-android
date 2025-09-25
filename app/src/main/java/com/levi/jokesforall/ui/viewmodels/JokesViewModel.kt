@@ -47,10 +47,9 @@ class JokesViewModel @Inject constructor(
     fun refreshJokes() {
         if (refreshJob != null) return
 
+        _refreshJoke.value = RefreshJokesState.Refreshing
         refreshJob = viewModelScope.launch {
-            _refreshJoke.value = RefreshJokesState.Refreshing
-            val result = jokesRepository.refreshJokes()
-            when (result) {
+            when (jokesRepository.refreshJokes()) {
                 is Result.Success -> _refreshJoke.value = RefreshJokesState.Success
                 is Result.Error -> _refreshJoke.value = RefreshJokesState.Error
             }
@@ -70,8 +69,8 @@ class JokesViewModel @Inject constructor(
         viewModelScope.launch {
             uiState.value.currentJoke?.let { joke ->
                 jokesRepository.markJokeAsSeen(joke.id)
-                _refreshJoke.value = RefreshJokesState.CanRefresh
                 hidePunchline()
+                _refreshJoke.value = RefreshJokesState.CanRefresh
             }
         }
     }

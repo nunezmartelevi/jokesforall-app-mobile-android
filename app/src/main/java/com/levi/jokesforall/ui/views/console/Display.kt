@@ -1,4 +1,4 @@
-package com.levi.jokesforall.ui.views.frames
+package com.levi.jokesforall.ui.views.console
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExitTransition
@@ -46,7 +46,7 @@ import java.text.BreakIterator
 import java.text.StringCharacterIterator
 
 @Composable
-fun DisplayFrame(
+fun Display(
     modifier: Modifier = Modifier,
     maxScreenHeight: Dp,
     isSoundOn: Boolean,
@@ -54,11 +54,10 @@ fun DisplayFrame(
     textAnimationSpeed: TextAnimationSpeed = TextAnimationSpeed.Fast,
     onTextAnimationEnd: () -> Unit = {},
     onTextAnimationStart: () -> Unit = {},
-    isFooterAlwaysVisible: Boolean = false,
+    shouldDisplayFooter: Boolean = false,
     footerContent: @Composable (RowScope.(TextStyle) -> Unit) = {}
 ) {
     val calculatedFrameHeight = (maxScreenHeight.value * 0.57).dp
-    var shouldDisplayFooter by remember { mutableStateOf(isFooterAlwaysVisible) }
 
     ConstraintLayout(
         modifier = modifier
@@ -82,14 +81,8 @@ fun DisplayFrame(
             },
             text = mainText,
             textAnimationSpeed = textAnimationSpeed,
-            onAnimationStart = {
-                onTextAnimationStart()
-                shouldDisplayFooter = isFooterAlwaysVisible
-            },
-            onAnimationEnd = {
-                onTextAnimationEnd()
-                shouldDisplayFooter = true
-            }
+            onAnimationStart = onTextAnimationStart,
+            onAnimationEnd = onTextAnimationEnd
         )
 
         Footer(
@@ -201,7 +194,7 @@ private fun Footer(
 @Composable
 private fun TextFramePreview() {
     JokesForAllTheme {
-        DisplayFrame(
+        Display(
             maxScreenHeight = PIXEL_4_VIEW_PORT.second,
             isSoundOn = false,
             mainText = "This is a joke",
