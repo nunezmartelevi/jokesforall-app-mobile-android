@@ -91,16 +91,8 @@ fun Display(
                     bottom.linkTo(parent.bottom)
                 },
             isVisible = shouldDisplayFooter
-        ) {
-            val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
-            val animatedColor by infiniteTransition.animateColor(
-                initialValue = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                targetValue = MaterialTheme.colorScheme.onSurface.copy(alpha = 1f),
-                animationSpec = infiniteRepeatable(tween(500), RepeatMode.Reverse),
-                label = "color"
-            )
-            val textStyle = MaterialTheme.typography.bodyMedium.copy(color = animatedColor)
-            footerContent(textStyle)
+        ) { footerStyle ->
+            footerContent(footerStyle)
         }
     }
 }
@@ -167,8 +159,17 @@ private fun CenterText(
 private fun Footer(
     modifier: Modifier = Modifier,
     isVisible: Boolean,
-    content: @Composable (RowScope.() -> Unit)
+    content: @Composable (RowScope.(TextStyle) -> Unit)
 ) {
+    val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
+    val animatedColor by infiniteTransition.animateColor(
+        initialValue = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+        targetValue = MaterialTheme.colorScheme.onSurface.copy(alpha = 1f),
+        animationSpec = infiniteRepeatable(tween(500), RepeatMode.Reverse),
+        label = "color"
+    )
+    val style = MaterialTheme.typography.bodyMedium.copy(color = animatedColor)
+
     Box(modifier = modifier.height(30.dp)) {
         AnimatedVisibility(
             visible = isVisible,
@@ -184,7 +185,7 @@ private fun Footer(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                content()
+                content(style)
             }
         }
     }
