@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Devices.PIXEL
 import androidx.compose.ui.tooling.preview.Devices.PIXEL_4
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -34,9 +33,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.levi.jokesforall.R
 import com.levi.jokesforall.ui.views.MediaPlayerVolumeEffect
 import com.levi.jokesforall.ui.views.rememberMediaPlayerState
-import com.levi.jokesforall.util.PIXEL_1_VIEW_PORT
 import com.levi.jokesforall.util.PIXEL_4_VIEW_PORT
-import com.levi.jokesforall.util.isHighWidthViewPort
+import com.levi.jokesforall.util.isWiderViewPort
 
 @Composable
 fun Controls(
@@ -75,8 +73,8 @@ fun Controls(
         val soundButtonSize = (screenSize.value * 0.05f).dp
 
         // sets buttons offset based on screen max width and height
-        val baseXOffset = if (isHighWidthViewPort(maxScreenWidth, maxScreenHeight)) 0.02 else 0.0
-        val baseYOffset = if (isHighWidthViewPort(maxScreenWidth, maxScreenHeight)) 0.01 else 0.0
+        val baseXOffset = if (isWiderViewPort(maxScreenWidth, maxScreenHeight)) 0.02 else 0.0
+        val baseYOffset = if (isWiderViewPort(maxScreenWidth, maxScreenHeight)) 0.01 else 0.0
         val aButtonOffset = Pair(
             (-maxScreenWidth.value * (0.06 + baseXOffset)).dp,
             (-maxScreenHeight.value * (0.1 + baseYOffset)).dp
@@ -191,16 +189,6 @@ fun ControlsPreview() {
     Controls(
         maxScreenWidth = PIXEL_4_VIEW_PORT.first,
         maxScreenHeight = PIXEL_4_VIEW_PORT.second,
-        isSoundOn = true
-    ) {}
-}
-
-@Preview(device = PIXEL)
-@Composable
-fun ControlsPreview2() {
-    Controls(
-        maxScreenWidth = PIXEL_1_VIEW_PORT.first,
-        maxScreenHeight = PIXEL_1_VIEW_PORT.second,
         isSoundOn = true
     ) {}
 }

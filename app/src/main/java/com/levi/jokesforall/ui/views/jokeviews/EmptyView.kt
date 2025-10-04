@@ -9,7 +9,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.levi.jokesforall.ui.theme.JokesForAllTheme
 import com.levi.jokesforall.ui.views.console.Display
 import com.levi.jokesforall.ui.views.console.Controls
-import com.levi.jokesforall.util.calculateTextFramePadding
+import com.levi.jokesforall.util.calculateDisplayPadding
 
 @Composable
 fun BoxWithConstraintsScope.EmptyView(
@@ -26,7 +26,8 @@ fun BoxWithConstraintsScope.EmptyView(
     )
 
     Display(
-        modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
+        modifier = Modifier.calculateDisplayPadding(maxWidth, maxHeight),
+        maxScreenWidth = maxWidth,
         maxScreenHeight = maxHeight,
         isSoundOn = isSoundOn,
         mainText = ""

@@ -13,7 +13,7 @@ import com.levi.jokesforall.R
 import com.levi.jokesforall.ui.theme.JokesForAllTheme
 import com.levi.jokesforall.ui.views.console.Controls
 import com.levi.jokesforall.ui.views.console.Display
-import com.levi.jokesforall.util.calculateTextFramePadding
+import com.levi.jokesforall.util.calculateDisplayPadding
 
 @Composable
 fun BoxWithConstraintsScope.ErrorView(
@@ -32,7 +32,8 @@ fun BoxWithConstraintsScope.ErrorView(
     )
 
     Display(
-        modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
+        modifier = Modifier.calculateDisplayPadding(maxWidth, maxHeight),
+        maxScreenWidth = maxWidth,
         maxScreenHeight = maxHeight,
         isSoundOn = isSoundOn,
         mainText = stringResource(R.string.error_message),

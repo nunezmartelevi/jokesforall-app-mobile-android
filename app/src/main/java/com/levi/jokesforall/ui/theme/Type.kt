@@ -24,7 +24,7 @@ val Typography = Typography(
     bodyMedium = TextStyle(
         fontFamily = boldPixels,
         fontWeight = FontWeight.Bold,
-        fontSize = 18.sp,
+        fontSize = 20.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp,
     )

@@ -28,7 +28,7 @@ import com.levi.jokesforall.ui.views.console.Display
 import com.levi.jokesforall.ui.views.console.TextAnimationSpeed
 import com.levi.jokesforall.ui.views.console.Controls
 import com.levi.jokesforall.ui.views.rememberMediaPlayerState
-import com.levi.jokesforall.util.calculateTextFramePadding
+import com.levi.jokesforall.util.calculateDisplayPadding
 import kotlinx.coroutines.delay
 
 @Composable
@@ -82,7 +82,8 @@ fun BoxWithConstraintsScope.IntroView(
     )
 
     Display(
-        modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
+        modifier = Modifier.calculateDisplayPadding(maxWidth, maxHeight),
+        maxScreenWidth = maxWidth,
         maxScreenHeight = maxHeight,
         isSoundOn = isSoundOn,
         mainText = introListState.text,

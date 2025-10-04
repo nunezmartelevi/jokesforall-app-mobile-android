@@ -41,6 +41,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.levi.jokesforall.R
 import com.levi.jokesforall.ui.theme.JokesForAllTheme
 import com.levi.jokesforall.util.PIXEL_4_VIEW_PORT
+import com.levi.jokesforall.util.calculateDisplayHeight
 import kotlinx.coroutines.delay
 import java.text.BreakIterator
 import java.text.StringCharacterIterator
@@ -48,6 +49,7 @@ import java.text.StringCharacterIterator
 @Composable
 fun Display(
     modifier: Modifier = Modifier,
+    maxScreenWidth: Dp,
     maxScreenHeight: Dp,
     isSoundOn: Boolean,
     mainText: String,
@@ -57,11 +59,9 @@ fun Display(
     shouldDisplayFooter: Boolean = false,
     footerContent: @Composable (RowScope.(TextStyle) -> Unit) = {}
 ) {
-    val calculatedFrameHeight = (maxScreenHeight.value * 0.57).dp
-
     ConstraintLayout(
         modifier = modifier
-            .height(calculatedFrameHeight)
+            .calculateDisplayHeight(maxScreenHeight, maxScreenWidth)
             .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 16.dp, vertical = 10.dp)
     ) {
@@ -196,6 +196,7 @@ private fun Footer(
 private fun TextFramePreview() {
     JokesForAllTheme {
         Display(
+            maxScreenWidth = PIXEL_4_VIEW_PORT.first,
             maxScreenHeight = PIXEL_4_VIEW_PORT.second,
             isSoundOn = false,
             mainText = "This is a joke",

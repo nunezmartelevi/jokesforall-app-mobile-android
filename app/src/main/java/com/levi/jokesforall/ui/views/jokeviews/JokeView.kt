@@ -28,7 +28,7 @@ import com.levi.jokesforall.ui.views.MediaPlayerVolumeEffect
 import com.levi.jokesforall.ui.views.console.Controls
 import com.levi.jokesforall.ui.views.console.Display
 import com.levi.jokesforall.ui.views.rememberMediaPlayerState
-import com.levi.jokesforall.util.calculateTextFramePadding
+import com.levi.jokesforall.util.calculateDisplayPadding
 
 @Composable
 fun BoxWithConstraintsScope.JokeView(
@@ -104,7 +104,8 @@ fun BoxWithConstraintsScope.JokeView(
     )
 
     Display(
-        modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
+        modifier = Modifier.calculateDisplayPadding(maxWidth, maxHeight),
+        maxScreenWidth = maxWidth,
         maxScreenHeight = maxHeight,
         isSoundOn = isSoundOn,
         mainText = jokeText ?: "",
