@@ -24,11 +24,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.levi.jokesforall.R
 import com.levi.jokesforall.ui.views.MediaPlayerVolumeEffect
-import com.levi.jokesforall.ui.views.console.Display
-import com.levi.jokesforall.ui.views.console.TextAnimationSpeed
-import com.levi.jokesforall.ui.views.console.Controls
+import com.levi.jokesforall.ui.views.components.DisplayLayout
+import com.levi.jokesforall.ui.views.components.TextAnimationSpeed
+import com.levi.jokesforall.ui.views.components.ControlLayout
 import com.levi.jokesforall.ui.views.rememberMediaPlayerState
-import com.levi.jokesforall.util.calculateTextFramePadding
+import com.levi.jokesforall.util.calculateDisplayPadding
 import kotlinx.coroutines.delay
 
 @Composable
@@ -71,7 +71,7 @@ fun BoxWithConstraintsScope.IntroView(
 
     MediaPlayerVolumeEffect(isSoundOn, mediaPlayerState)
 
-    Controls(
+    ControlLayout(
         modifier = modifier,
         maxScreenWidth = maxWidth,
         maxScreenHeight = maxHeight,
@@ -81,8 +81,9 @@ fun BoxWithConstraintsScope.IntroView(
         onSoundButtonPress = { onToggleSound(isSoundOn) }
     )
 
-    Display(
-        modifier = Modifier.calculateTextFramePadding(maxWidth, maxHeight),
+    DisplayLayout(
+        modifier = Modifier.calculateDisplayPadding(maxWidth, maxHeight),
+        maxScreenWidth = maxWidth,
         maxScreenHeight = maxHeight,
         isSoundOn = isSoundOn,
         mainText = introListState.text,
