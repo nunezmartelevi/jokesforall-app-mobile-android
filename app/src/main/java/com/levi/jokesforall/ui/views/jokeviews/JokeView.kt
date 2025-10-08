@@ -25,8 +25,8 @@ import com.levi.jokesforall.domain.model.JokeType
 import com.levi.jokesforall.ui.theme.JokesForAllTheme
 import com.levi.jokesforall.ui.views.JokesPreviewParameterProvider
 import com.levi.jokesforall.ui.views.MediaPlayerVolumeEffect
-import com.levi.jokesforall.ui.views.console.Controls
-import com.levi.jokesforall.ui.views.console.Display
+import com.levi.jokesforall.ui.views.components.ControlLayout
+import com.levi.jokesforall.ui.views.components.DisplayLayout
 import com.levi.jokesforall.ui.views.rememberMediaPlayerState
 import com.levi.jokesforall.util.calculateDisplayPadding
 
@@ -74,7 +74,7 @@ fun BoxWithConstraintsScope.JokeView(
 
     MediaPlayerVolumeEffect(isSoundOn, mediaPlayerState)
 
-    Controls(
+    ControlLayout(
         modifier = modifier,
         maxScreenWidth = maxWidth,
         maxScreenHeight = maxHeight,
@@ -103,7 +103,7 @@ fun BoxWithConstraintsScope.JokeView(
         onSoundButtonPress = { onToggleSound(isSoundOn) }
     )
 
-    Display(
+    DisplayLayout(
         modifier = Modifier.calculateDisplayPadding(maxWidth, maxHeight),
         maxScreenWidth = maxWidth,
         maxScreenHeight = maxHeight,

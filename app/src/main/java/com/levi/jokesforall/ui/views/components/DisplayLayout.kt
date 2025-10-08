@@ -1,4 +1,4 @@
-package com.levi.jokesforall.ui.views.console
+package com.levi.jokesforall.ui.views.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExitTransition
@@ -31,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -51,7 +50,7 @@ import java.text.BreakIterator
 import java.text.StringCharacterIterator
 
 @Composable
-fun Display(
+fun DisplayLayout(
     modifier: Modifier = Modifier,
     maxScreenWidth: Dp,
     maxScreenHeight: Dp,
@@ -189,7 +188,7 @@ private fun Footer(
         animationSpec = infiniteRepeatable(tween(500), RepeatMode.Reverse),
         label = "color"
     )
-    val computedFontSize = (maxScreenSize / 55).value.sp
+    val computedFontSize = (maxScreenSize / 60).value.sp
     val computedHeight = maxScreenSize / 40
     val style = MaterialTheme.typography.bodyMedium.copy(
         color = animatedColor,
@@ -201,8 +200,7 @@ private fun Footer(
             visible = isVisible,
             enter = fadeIn(
                 animationSpec = tween(
-                    durationMillis = 500,
-                    delayMillis = 100
+                    durationMillis = 500
                 )
             ),
             exit = ExitTransition.None
@@ -221,7 +219,7 @@ private fun Footer(
 @Composable
 private fun TextFramePreview() {
     JokesForAllTheme {
-        Display(
+        DisplayLayout(
             maxScreenWidth = PIXEL_4_VIEW_PORT.first,
             maxScreenHeight = PIXEL_4_VIEW_PORT.second,
             isSoundOn = false,

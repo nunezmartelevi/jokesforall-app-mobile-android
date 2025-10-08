@@ -11,8 +11,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.levi.jokesforall.R
 import com.levi.jokesforall.ui.theme.JokesForAllTheme
-import com.levi.jokesforall.ui.views.console.Controls
-import com.levi.jokesforall.ui.views.console.Display
+import com.levi.jokesforall.ui.views.components.ControlLayout
+import com.levi.jokesforall.ui.views.components.DisplayLayout
 import com.levi.jokesforall.util.calculateDisplayPadding
 
 @Composable
@@ -22,7 +22,7 @@ fun BoxWithConstraintsScope.ErrorView(
     onToggleSound: (Boolean) -> Unit,
     onRetry: () -> Unit
 ) {
-    Controls(
+    ControlLayout(
         modifier = modifier,
         maxScreenWidth = maxWidth,
         maxScreenHeight = maxHeight,
@@ -31,12 +31,13 @@ fun BoxWithConstraintsScope.ErrorView(
         onSoundButtonPress = { onToggleSound(isSoundOn) }
     )
 
-    Display(
+    DisplayLayout(
         modifier = Modifier.calculateDisplayPadding(maxWidth, maxHeight),
         maxScreenWidth = maxWidth,
         maxScreenHeight = maxHeight,
         isSoundOn = isSoundOn,
         mainText = stringResource(R.string.error_message),
+        shouldDisplayFooter = true
     ) { textStyle ->
         Text(
             modifier = Modifier.fillMaxWidth(),
