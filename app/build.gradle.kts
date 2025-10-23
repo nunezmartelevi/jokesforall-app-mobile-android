@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     alias(libs.plugins.android.application)
@@ -11,14 +10,14 @@ plugins {
 }
 
 android {
-    namespace = "com.levi.jokesforall"
+    namespace = "com.levi.jokesmachine"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.levi.jokesforall"
+        applicationId = "com.levi.jokesmachine"
         minSdk = 24
         targetSdk = 36
-        versionCode = 4
+        versionCode = 5
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
