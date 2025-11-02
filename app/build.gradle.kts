@@ -10,14 +10,14 @@ plugins {
 }
 
 android {
-    namespace = "com.levi.jokesmachine"
+    namespace = "com.levi.jokesforall"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.levi.jokesmachine"
+        applicationId = "com.levi.jokesforall"
         minSdk = 24
         targetSdk = 36
-        versionCode = 5
+        versionCode = 6
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
