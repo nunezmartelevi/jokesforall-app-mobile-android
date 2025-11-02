@@ -1,10 +1,8 @@
-# Jokes For All - Android App
+# Jokes Machine - Android App
 
 ## 📝 Description
 
-Jokes For All is an Android application designed to shows funny jokes. This project is built using modern Android development practices.
-
-*(As your project develops, you can add more details about its features and what makes it unique.)*
+Jokes Machine is an app of jokes about programming with a retro console look and an old-school vibe that feels straight out of the ’80s terminal days. This project is built using modern Android development practices.
 
 ## 🚀 Features
 
