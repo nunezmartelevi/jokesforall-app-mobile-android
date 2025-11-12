@@ -4,6 +4,8 @@
 
 Jokes Machine is an app of jokes about programming with a retro console look and an old-school vibe that feels straight out of the ’80s terminal days. This project is built using modern Android development practices.
 
+<img width="1198" height="2531" alt="Screenshot_20251112_174554" src="https://github.com/user-attachments/assets/00d33215-39e3-489e-a816-369a699daafb" />
+
 ## 🚀 Features
 
 * Fetches 10 random jokes from a public API.
