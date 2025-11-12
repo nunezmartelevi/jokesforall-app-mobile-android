@@ -1,4 +1,4 @@
-package com.levi.jokesforall.ui.views
+package com.levi.jokesforall.ui.views.subviews
 
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope

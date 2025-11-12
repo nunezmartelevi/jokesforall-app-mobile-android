@@ -145,7 +145,7 @@ private fun CenterText(
     val breakIterator = remember(text) { BreakIterator.getCharacterInstance() }
     var substringText by remember { mutableStateOf("") }
     val typingDelayInMs = textAnimationSpeed.value
-    val computedFontSize = (maxScreenSize / 50).value.sp
+    val computedFontSize = (maxScreenSize / 55).value.sp
 
     LaunchedEffect(text) {
         onAnimationStart()
@@ -166,7 +166,7 @@ private fun CenterText(
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
         ),
-        maxLines = 12,
+        maxLines = 13,
         autoSize = TextAutoSize.StepBased(
             minFontSize = (computedFontSize.value - 6).sp,
             maxFontSize = computedFontSize
@@ -188,7 +188,7 @@ private fun Footer(
         animationSpec = infiniteRepeatable(tween(500), RepeatMode.Reverse),
         label = "color"
     )
-    val computedFontSize = (maxScreenSize / 60).value.sp
+    val computedFontSize = (maxScreenSize / 55).value.sp
     val computedHeight = maxScreenSize / 40
     val style = MaterialTheme.typography.bodyMedium.copy(
         color = animatedColor,
