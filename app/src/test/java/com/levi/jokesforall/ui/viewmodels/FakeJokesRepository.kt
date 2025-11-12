@@ -1,6 +1,6 @@
 package com.levi.jokesforall.ui.viewmodels
 
-import com.levi.jokesforall.data.remote.Result
+import com.levi.jokesforall.data.remote.Results
 import com.levi.jokesforall.domain.model.Joke
 import com.levi.jokesforall.domain.repository.JokesRepository
 import com.levi.jokesforall.domainJokes
@@ -16,12 +16,12 @@ class FakeJokesRepository(
         emit(jokesList)
     }
 
-    override suspend fun refreshJokes(): Result<Unit> {
+    override suspend fun refreshJokes(): Results<Unit> {
         return if (isSuccessful) {
             jokesList.addAll(domainJokes)
-            Result.Success(Unit)
+            Results.Success(Unit)
         } else {
-            Result.Error(Exception("Error"))
+            Results.Error(Exception("Error"))
         }
     }
 
