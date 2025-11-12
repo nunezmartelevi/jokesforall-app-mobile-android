@@ -1,4 +1,4 @@
-package com.levi.jokesforall.ui.views
+package com.levi.jokesforall.ui.views.subviews
 
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
@@ -23,7 +23,6 @@ import com.levi.jokesforall.R
 import com.levi.jokesforall.domain.model.Joke
 import com.levi.jokesforall.domain.model.JokeType
 import com.levi.jokesforall.ui.theme.JokesForAllTheme
-import com.levi.jokesforall.ui.views.components.JokesPreviewParameterProvider
 import com.levi.jokesforall.ui.views.components.MediaPlayerVolumeEffect
 import com.levi.jokesforall.ui.views.components.ControlLayout
 import com.levi.jokesforall.ui.views.components.DisplayLayout

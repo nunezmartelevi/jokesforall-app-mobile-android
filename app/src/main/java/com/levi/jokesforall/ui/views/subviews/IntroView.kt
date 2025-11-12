@@ -1,4 +1,4 @@
-package com.levi.jokesforall.ui.views
+package com.levi.jokesforall.ui.views.subviews
 
 import android.view.WindowManager
 import androidx.activity.ComponentActivity

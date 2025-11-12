@@ -7,6 +7,11 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.levi.jokesforall.ui.viewmodels.JokesViewModel
+import com.levi.jokesforall.ui.views.subviews.EmptyView
+import com.levi.jokesforall.ui.views.subviews.ErrorView
+import com.levi.jokesforall.ui.views.subviews.IntroView
+import com.levi.jokesforall.ui.views.subviews.JokeView
+import com.levi.jokesforall.ui.views.subviews.LoadingView
 
 @Composable
 fun JokesScreen(viewModel: JokesViewModel = viewModel()) {
