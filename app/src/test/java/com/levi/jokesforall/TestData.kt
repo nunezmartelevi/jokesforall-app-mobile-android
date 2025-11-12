@@ -1,9 +1,9 @@
 package com.levi.jokesforall
 
-import com.levi.jokesforall.datas.model.FlagsDto
-import com.levi.jokesforall.datas.model.JokeDto
-import com.levi.jokesforall.domains.model.Joke
-import com.levi.jokesforall.domains.model.JokeType
+import com.levi.jokesforall.data.model.FlagsDto
+import com.levi.jokesforall.data.model.JokeDto
+import com.levi.jokesforall.domain.model.Joke
+import com.levi.jokesforall.domain.model.JokeType
 
 val remoteJokes: List<JokeDto> = listOf(
     JokeDto(

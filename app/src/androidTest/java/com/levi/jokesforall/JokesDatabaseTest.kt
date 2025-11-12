@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.levi.jokesforall.datas.database.JokeDao
-import com.levi.jokesforall.datas.database.JokesDatabase
+import com.levi.jokesforall.data.database.JokeDao
+import com.levi.jokesforall.data.database.JokesDatabase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After

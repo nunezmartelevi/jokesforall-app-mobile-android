@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.levi.jokesforall.uis.theme.JokesForAllTheme
-import com.levi.jokesforall.uis.views.JokesScreen
+import com.levi.jokesforall.ui.theme.JokesForAllTheme
+import com.levi.jokesforall.ui.views.JokesScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
