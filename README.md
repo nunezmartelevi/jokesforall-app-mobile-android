@@ -16,8 +16,9 @@ Jokes Machine is an app of jokes about programming with a retro console look and
 *   **Jetpack Compose:** For building the user interface declaratively.
 *   **Material Design 3:** For modern UI components and styling.
 *   **Android Studio:** The official IDE for Android development.
-*   Retrofit:** For type-safe HTTP calls to fetch jokes from the API.
-*   **Hilt:** For dependency injection.
+*   **Retrofit:** For type-safe HTTP calls to fetch jokes from the API.
+*   **Dagger-Hilt:** For dependency injection.
+*   **Room:** For offline caching.
 
 ## 🏁 Getting Started
 
