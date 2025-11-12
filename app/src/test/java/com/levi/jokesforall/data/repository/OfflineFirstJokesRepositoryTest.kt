@@ -2,7 +2,7 @@ package com.levi.jokesforall.data.repository
 
 import com.levi.jokesforall.data.database.JokeDao
 import com.levi.jokesforall.data.remote.JokesService
-import com.levi.jokesforall.data.remote.Result
+import com.levi.jokesforall.data.remote.Results
 import com.levi.jokesforall.domain.repository.JokesRepository
 import com.levi.jokesforall.remoteJokes
 import kotlinx.coroutines.flow.first
@@ -42,7 +42,7 @@ class OfflineFirstJokesRepositoryTest {
             StandardTestDispatcher(testScheduler)
         )
         val result = repository.refreshJokes()
-        assert(result is Result.Success)
+        assert(result is Results.Success)
     }
 
     @Test
@@ -54,7 +54,7 @@ class OfflineFirstJokesRepositoryTest {
             StandardTestDispatcher(testScheduler)
         )
         val result = repository.refreshJokes()
-        assert(result is Result.Error)
+        assert(result is Results.Error)
     }
 
     @Test
