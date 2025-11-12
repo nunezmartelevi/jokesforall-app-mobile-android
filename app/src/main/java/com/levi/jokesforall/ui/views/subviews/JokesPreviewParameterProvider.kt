@@ -1,14 +1,14 @@
-package com.levi.jokesforall.ui.views.components
+package com.levi.jokesforall.ui.views.subviews
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.levi.jokesforall.domain.model.Joke
 import com.levi.jokesforall.domain.model.JokeType
 
 class JokesPreviewParameterProvider : PreviewParameterProvider<List<Joke>> {
-    override val values: Sequence<List<Joke>> = sequenceOf(data.jokes)
+    override val values: Sequence<List<Joke>> = sequenceOf(Data.jokes)
 }
 
-private object data {
+private object Data {
     val jokes: List<Joke> = listOf(
         Joke(
             id = 135,
