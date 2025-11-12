@@ -2,7 +2,7 @@ package com.levi.jokesforall.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.levi.jokesforall.data.remote.Results
+import com.levi.jokesforall.data.remote.Result
 import com.levi.jokesforall.domain.model.Joke
 import com.levi.jokesforall.domain.repository.PreferencesRepository
 import com.levi.jokesforall.domain.repository.JokesRepository
@@ -50,8 +50,8 @@ class JokesViewModel @Inject constructor(
         _refreshJoke.value = RefreshJokesState.Refreshing
         refreshJob = viewModelScope.launch {
             when (jokesRepository.refreshJokes()) {
-                is Results.Success -> _refreshJoke.value = RefreshJokesState.Success
-                is Results.Error -> _refreshJoke.value = RefreshJokesState.Error
+                is Result.Success -> _refreshJoke.value = RefreshJokesState.Success
+                is Result.Error -> _refreshJoke.value = RefreshJokesState.Error
             }
             refreshJob = null
         }
