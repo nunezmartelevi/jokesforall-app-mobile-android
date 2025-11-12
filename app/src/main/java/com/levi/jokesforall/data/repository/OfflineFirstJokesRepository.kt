@@ -4,7 +4,7 @@ import com.levi.jokesforall.data.database.JokeDao
 import com.levi.jokesforall.data.model.asDatabaseModel
 import com.levi.jokesforall.data.model.asDomainModel
 import com.levi.jokesforall.data.remote.Dispatcher
-import com.levi.jokesforall.data.remote.JokesDispatchers.IO
+import com.levi.jokesforall.data.remote.JokesDispatcher.IO
 import com.levi.jokesforall.data.remote.JokesService
 import com.levi.jokesforall.data.remote.Result
 import com.levi.jokesforall.domain.model.Joke
