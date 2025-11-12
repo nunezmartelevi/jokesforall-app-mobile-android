@@ -1,7 +1,7 @@
 package com.levi.jokesforall.di
 
 import com.levi.jokesforall.data.remote.Dispatcher
-import com.levi.jokesforall.data.remote.JokesDispatchers
+import com.levi.jokesforall.data.remote.JokesDispatcher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,10 +14,10 @@ import kotlinx.coroutines.Dispatchers
 object DispatchersModule {
 
     @Provides
-    @Dispatcher(JokesDispatchers.IO)
+    @Dispatcher(JokesDispatcher.IO)
     fun providesIODispatcher(): CoroutineDispatcher = Dispatchers.IO
 
     @Provides
-    @Dispatcher(JokesDispatchers.Default)
+    @Dispatcher(JokesDispatcher.Default)
     fun providesDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
 }
