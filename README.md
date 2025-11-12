@@ -8,7 +8,7 @@ Jokes Machine is an app of jokes about programming with a retro console look and
 
 * Fetches 10 random jokes from a public API.
 * All jokes about programing and tech in general.
-* Save your favorite jokes for later.
+* Offline support.
 
 ## 🛠️ Built With
 
