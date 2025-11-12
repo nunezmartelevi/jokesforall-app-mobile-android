@@ -1,6 +1,6 @@
 package com.levi.jokesforall
 
-import com.levi.jokesforall.data.model.JokeEntity
+import com.levi.jokesforall.datas.model.JokeEntity
 
 val jokesEntities = listOf(
     JokeEntity(
